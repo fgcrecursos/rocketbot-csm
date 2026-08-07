@@ -1,0 +1,185 @@
+/* ==========================================================================
+   TOKENS — sistema de diseño Rocketbot
+   --------------------------------------------------------------------------
+   Fuente de verdad única para toda la plataforma. Los valores de marca salen
+   del sitio rocketbot.com, no de los prototipos: ahí el rojo es #BC0017 y el
+   azul #2B7FFF, mientras que las herramientas originales traían tres paletas
+   distintas entre sí.
+
+   Las cuatro herramientas se escribieron cada una con sus propios nombres de
+   variable (--rb / --rb-red, --text / --ink, --muted / --ink-2). En vez de
+   reescribir su CSS, más abajo se definen esos nombres como alias de los
+   canónicos. Así el CSS heredado sigue funcionando y hay un solo lugar donde
+   cambiar un color.
+   ========================================================================== */
+
+:root {
+  /* ---- Marca ---- */
+  --rb-red: #bc0017;
+  --rb-red-deep: #8e0011;
+  --rb-red-hi: #e4132e;
+  /* El rojo de marca cumple dos papeles con exigencias opuestas de contraste:
+     como fondo de botón necesita ser oscuro para que el texto blanco encima se
+     lea, y como texto sobre una superficie necesita ser claro. En tema claro un
+     solo valor sirve para los dos (#BC0017 da 6.7:1 sobre blanco y 7.4:1 con
+     blanco encima). En oscuro no: #E4132E da 4.7:1 con blanco encima —bien como
+     fondo— pero solo 3.2:1 como texto sobre la superficie. De ahí este segundo
+     token, que solo se usa para texto.
+
+     El azul, el verde y el ámbar tienen el problema espejado: son claros, así
+     que como texto sobre blanco quedan entre 3.5:1 y 3.8:1 —el azul de marca
+     #2B7FFF da 3.74:1— y necesitan una variante profunda. En oscuro esas tres
+     ya sirven tal cual y la variante coincide con el color base. */
+  --rb-red-txt: #bc0017;
+  --rb-blue-txt: #1a5fc8;
+  --rb-green-txt: #0f5c42;
+  --rb-amber-txt: #8a5610;
+  --rb-purple-txt: #6e4b9e;
+  --rb-secondary: #263238;
+  --rb-green: #1d9e75;
+  --rb-green-deep: #0f5c42;
+  --rb-blue: #2b7fff;
+  --rb-blue-ink: #2e77c4; /* variante legible sobre fondo claro */
+  --rb-amber: #ba7517;
+  --rb-purple: #6e4b9e;
+
+  /* ---- Superficies ---- */
+  --bg: #f5f7f8;
+  --bg-2: #e8eef0;
+  --surface: #ffffff;
+  --surface-2: #fafbfc;
+  --surface-3: #eef2f4;
+  --line: #dfe5e8;
+  --line-soft: #edf1f3;
+
+  /* ---- Texto ----
+     --ink-3 se oscureció de #75858D a #5C6B73: el original daba 3.7:1 sobre
+     --surface-2 y las pistas de las preguntas, que van en 12,5px, quedaban
+     por debajo del mínimo AA de 4.5:1. Ahora da 4.9:1. */
+  --ink: #263238;
+  --ink-2: #4a5a62;
+  --ink-3: #5c6b73;
+
+  /* ---- Barra lateral (siempre oscura, en ambos temas) ---- */
+  --side: #1b2429;
+  --side-ink: #b4c2c8;
+  --side-hover: rgba(255, 255, 255, 0.07);
+  --side-line: rgba(255, 255, 255, 0.09);
+
+  /* ---- Forma ---- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r: 14px;
+  --shadow: 0 1px 2px rgba(38, 50, 56, 0.06), 0 8px 24px -12px rgba(38, 50, 56, 0.14);
+  --shadow-lg: 0 4px 10px rgba(38, 50, 56, 0.08), 0 26px 50px -24px rgba(38, 50, 56, 0.3);
+  --ease: cubic-bezier(0.2, 0.7, 0.25, 1);
+
+  /* ---- Tipografía ---- */
+  --display: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --body: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, 'Courier New', monospace;
+
+  /* ---- Rellenos que llevan texto blanco encima ----
+     Los accents de marca se aclaran en tema oscuro para poder usarse como
+     texto, y eso los vuelve demasiado claros para llevar blanco encima. Estos
+     valores no cambian con el tema y son los únicos que se usan detrás de un
+     texto blanco chico: insignias de producto, numerales, etiquetas. Todos
+     dan 5.4:1 o más contra #FFF. */
+  --chip-red: #bc0017;
+  --chip-blue: #1a5fc8;
+  --chip-green: #0f5c42;
+  --chip-amber: #8a5610;
+  --chip-purple: #6e4b9e;
+  --chip-dark: #263238;
+
+  /* ---- Medidas del armazón ---- */
+  --side-w: 256px;
+  --top-h: 56px;
+}
+
+[data-theme='dark'] {
+  --rb-red: #e4132e;
+  --rb-red-deep: #bc0017;
+  --rb-red-hi: #f43a52;
+  --rb-red-txt: #ff6b7d;
+  --rb-green: #2ecc94;
+  --rb-green-deep: #1d9e75;
+  --rb-green-txt: #2ecc94;
+  --rb-blue: #5fa6ee;
+  --rb-blue-ink: #5fa6ee;
+  --rb-blue-txt: #5fa6ee;
+  --rb-amber: #d99a33;
+  --rb-amber-txt: #d99a33;
+  --rb-purple: #9b78cc;
+  --rb-purple-txt: #b39bda;
+
+  --bg: #151e22;
+  --bg-2: #111a1e;
+  --surface: #1c272c;
+  --surface-2: #212e34;
+  --surface-3: #29383f;
+  --line: #33434b;
+  --line-soft: #2a383f;
+
+  --ink: #e3eaed;
+  --ink-2: #aebcc3;
+  /* Mismo motivo que en claro: #7D8D95 daba 4.06:1 y ahora da 5.1:1, también
+     contra las superficies levemente teñidas de las capas de la suite. */
+  --ink-3: #98a8b0;
+
+  --side: #0f171a;
+  --side-ink: #94a6ae;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.4), 0 26px 50px -24px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================================
+   ALIAS — nombres que usan las herramientas heredadas
+   ==========================================================================
+   Health Score venía en oscuro por defecto con --rb / --text / --muted.
+   Roadmap y el panel usan --q-* para los cuadrantes y --rb-dark.
+   Nada de esto se toca en el CSS de cada herramienta: se resuelve acá.
+   ========================================================================== */
+
+:root,
+[data-theme='dark'] {
+  /* Health Score */
+  --rb: var(--rb-red);
+  --rb-hi: var(--rb-red-hi);
+  --blue: var(--rb-blue);
+  --blue-hi: var(--rb-blue);
+  --green: var(--rb-green);
+  --green-hi: var(--rb-green);
+  --amber: var(--rb-amber);
+  --amber-hi: var(--rb-amber);
+  --text: var(--ink);
+  --muted: var(--ink-2);
+  --faint: var(--ink-3);
+
+  /* Roadmap y panel */
+  --rb-dark: var(--rb-secondary);
+  --q-green: var(--rb-green);
+  --q-blue: var(--rb-blue);
+  --q-amber: var(--rb-amber);
+  --q-red: var(--rb-red);
+}
+
+/* Los "-hi" son los colores con que Health Score pinta severidades y valores
+   por pilar, casi siempre como texto sobre una insignia teñida con ese mismo
+   tono. Eso aclara el fondo, así que necesitan más separación que el accent
+   base: en claro hay que oscurecerlos y en oscuro aclararlos. */
+:root:not([data-theme='dark']) {
+  --rb-hi: var(--rb-red);
+  --blue-hi: var(--rb-blue-txt);
+  --green-hi: var(--rb-green-txt);
+  --amber-hi: var(--rb-amber-txt);
+}
+
+[data-theme='dark'] {
+  --rb-hi: #ff8c99;
+  --blue-hi: #8cc0f5;
+  --green-hi: #4edba8;
+  --amber-hi: #edb253;
+}

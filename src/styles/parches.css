@@ -1,0 +1,293 @@
+/* ==========================================================================
+   PARCHES
+   --------------------------------------------------------------------------
+   Ajustes de las herramientas heredadas para que convivan dentro del armazón.
+   Todo lo de acá es CSS: el motor y el CSS original de cada herramienta quedan
+   como estaban, y esta hoja se carga última.
+
+   Se agrupa por motivo, no por herramienta, para que se vea qué se corrigió y
+   por qué. Va incluida en las cuatro páginas; los selectores que no aplican no
+   hacen nada.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Barras pegajosas
+   Cada herramienta calculaba su `top` contra su propia barra superior, que ya
+   no existe. Ahora se mide contra la del armazón.
+   -------------------------------------------------------------------------- */
+.rbp-cuerpo .progress-wrap {
+  top: var(--top-h);
+}
+.rbp-cuerpo .sticky {
+  top: calc(var(--top-h) + 18px);
+}
+
+/* --------------------------------------------------------------------------
+   2. Roadmap: de barra lateral propia a barra de pasos
+   Las cuatro vistas (Cliente · Procesos · Análisis · Informe) son el recorrido
+   interno de la herramienta, no navegación de la plataforma, así que se
+   conservan. Cambia solo la forma: dejan de ser una segunda columna oscura
+   —que competiría con la del armazón— y pasan a ser una tira horizontal, igual
+   que los pasos de las herramientas 02 y 03. El marcado que genera renderNav()
+   no se toca.
+   -------------------------------------------------------------------------- */
+.rbp-cuerpo .app {
+  display: block;
+  min-height: 0;
+}
+.rbp-cuerpo .side {
+  position: sticky;
+  top: var(--top-h);
+  z-index: 40;
+  height: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 22px;
+  background: var(--surface);
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  overflow-y: visible;
+}
+.rbp-cuerpo .side-brand,
+.rbp-cuerpo .side .theme-btn {
+  display: none; /* la marca y el tema viven en el armazón */
+}
+.rbp-cuerpo .side .nav {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  padding: 0;
+  flex: 0 1 auto;
+}
+.rbp-cuerpo .side .nav-i {
+  width: auto;
+  white-space: nowrap;
+  color: var(--ink-2);
+  padding: 8px 13px;
+}
+.rbp-cuerpo .side .nav-i:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.rbp-cuerpo .side .nav-i.on {
+  background: var(--rb-red);
+  color: #fff;
+}
+.rbp-cuerpo .side .nav-n {
+  background: var(--surface-3);
+  color: var(--ink-3);
+}
+.rbp-cuerpo .side .nav-i.on .nav-n {
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+}
+.rbp-cuerpo .side .nav-badge {
+  margin-left: 6px;
+  background: var(--surface-3);
+  color: var(--ink-2);
+}
+.rbp-cuerpo .side .nav-i.on .nav-badge {
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
+}
+.rbp-cuerpo .side-foot {
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  flex: 0 0 auto;
+  min-width: 150px;
+}
+.rbp-cuerpo .side-prog {
+  background: var(--line);
+}
+.rbp-cuerpo .side-foot .lbl {
+  color: var(--ink-3);
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   3. Colores que no sobreviven al cambio de tema
+   Las herramientas 02 y 03 se escribieron solo para fondo claro y traen unos
+   pocos valores fijos. En oscuro quedaban ilegibles.
+   -------------------------------------------------------------------------- */
+
+/* .warn: texto marrón oscuro sobre ámbar translúcido. */
+[data-theme='dark'] .rbp-cuerpo .warn {
+  color: var(--rb-amber);
+  background: color-mix(in srgb, var(--rb-amber) 14%, transparent);
+}
+
+/* .b-prod: la insignia de producto usaba un gris casi transparente que sobre
+   fondo oscuro desaparecía. */
+[data-theme='dark'] .rbp-cuerpo .b-prod {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--ink-2);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Opciones marcadas: 4% de tinte se ve en blanco, no en oscuro. */
+[data-theme='dark'] .rbp-cuerpo .opt.sel {
+  background: color-mix(in srgb, var(--rb-red) 18%, transparent);
+}
+[data-theme='dark'] .rbp-cuerpo .opt.sel.multi {
+  background: color-mix(in srgb, var(--rb-blue) 20%, transparent);
+}
+[data-theme='dark'] .rbp-cuerpo .opt:hover {
+  background: color-mix(in srgb, var(--rb-blue) 12%, transparent);
+}
+
+/* .level-hero y .tip-box se pintan con --rb-dark, que en tema oscuro queda
+   más claro que el fondo. Se mantienen legibles porque su texto es claro,
+   pero el borde ayuda a separarlos de la tarjeta. */
+[data-theme='dark'] .rbp-cuerpo .level-hero {
+  border: 1px solid var(--line);
+}
+
+/* --- Accents de marca usados como TEXTO ---
+   Los cuatro accents fallan AA en algún tema: el rojo en oscuro (3.2:1) porque
+   es oscuro, y el azul, el verde y el ámbar en claro (3.5–3.8:1) porque son
+   claros. En vez de reescribir cada regla de las herramientas, se redefinen
+   las variables sobre los elementos que las usan como color de texto: tanto
+   una regla de hoja (`color:var(--rb-blue)`) como un estilo en línea que pone
+   el motor resuelven contra el valor más cercano, así que basta con esto.
+   Los fondos de marca no entran acá: ahí la exigencia es la contraria. */
+.rbp-cuerpo .eyebrow,
+.rbp-cuerpo .step.active,
+.rbp-cuerpo .f-tag,
+.rbp-cuerpo .bar-val,
+.rbp-cuerpo .fact .n,
+.rbp-cuerpo .phase .when,
+.rbp-cuerpo .note.r,
+.rbp-cuerpo .heat-tag,
+.rbp-cuerpo .b-roi-4,
+.rbp-cuerpo .b-roi-3,
+.rbp-cuerpo .b-roi-2,
+.rbp-cuerpo .tag,
+.rbp-cuerpo .pi-s .v,
+.rbp-cuerpo td.num,
+.rbp-cuerpo .fase .when {
+  --rb-red: var(--rb-red-txt);
+  --rb-blue: var(--rb-blue-txt);
+  --rb-green: var(--rb-green-txt);
+  --rb-amber: var(--rb-amber-txt);
+  /* Los --q-* del Roadmap se declaran como alias en :root, y una propiedad
+     personalizada resuelve su valor en el elemento donde se declara. O sea que
+     --q-green ya quedó fijado al --rb-green de :root y redefinir --rb-green
+     acá no lo cambia: hay que reasignar el --q-* directamente. */
+  --q-red: var(--rb-red-txt);
+  --q-blue: var(--rb-blue-txt);
+  --q-green: var(--rb-green-txt);
+  --q-amber: var(--rb-amber-txt);
+  --rb-purple: var(--rb-purple-txt);
+}
+
+/* Rellenos de color con texto blanco encima: círculos de fase, numeración de
+   la leyenda de la matriz y las barras de prioridad por área. Todos toman el
+   color de un estilo en línea que resuelve una variable de marca. */
+.rbp-cuerpo .fase-n,
+.rbp-cuerpo .mxl b,
+.rbp-cuerpo .heat-fill {
+  --rb-red: var(--chip-red);
+  --rb-blue: var(--chip-blue);
+  --rb-green: var(--chip-green);
+  --rb-amber: var(--chip-amber);
+  --rb-dark: var(--chip-dark);
+  --q-red: var(--chip-red);
+  --q-blue: var(--chip-blue);
+  --q-green: var(--chip-green);
+  --q-amber: var(--chip-amber);
+  --rb-purple: var(--chip-purple);
+}
+
+/* El área sin datos se pinta con el literal #9AA8AE, un gris claro que el
+   motor escribe en el atributo style y que ninguna variable alcanza. Sobre él,
+   el blanco queda en 2.45:1. Se lo detecta por el propio atributo. */
+.rbp-cuerpo .heat-fill[style*='9AA8AE'] .s {
+  color: #1b2429;
+}
+.rbp-cuerpo .heat-tag[style*='9AA8AE'] {
+  color: var(--ink-2) !important;
+}
+
+/* Insignias de producto: mismo truco al revés. El motor les pone
+   `background:var(--rb-blue)` y llevan texto blanco encima, así que necesitan
+   los valores profundos en los dos temas. */
+.rbp-cuerpo .prod-badge {
+  --rb-red: var(--chip-red);
+  --rb-blue: var(--chip-blue);
+  --rb-green: var(--chip-green);
+  --rb-amber: var(--chip-amber);
+  --rb-dark: var(--chip-dark);
+}
+
+/* El pilar de Automatización trae su color como literal `#6E4B9E` dentro del
+   motor, no como variable, así que la redefinición de arriba no lo alcanza y
+   en oscuro queda en 2.3:1. Solo en ese tema la cifra pasa a tinta plena; la
+   barra de al lado sigue coloreada, que es donde se lee el pilar. */
+[data-theme='dark'] .rbp-cuerpo .bar-val {
+  color: var(--ink) !important;
+}
+
+/* Escala de niveles dentro de .level-hero, que es oscuro en los dos temas.
+   Los niveles todavía no alcanzados iban en #8A9BA3 y daban 3.6:1. Quedan
+   fuera el nivel actual y los ya superados: tienen fondo propio y su blanco
+   sobre rojo de marca ya cumple. */
+.rbp-cuerpo .lv:not(.on):not(.past) {
+  color: #b8c6cc;
+}
+
+/* --------------------------------------------------------------------------
+   4. Formularios en tema oscuro
+   Los `select` de las herramientas 02 y 03 heredan el fondo del sistema y en
+   oscuro quedaban con texto negro sobre negro en algunos navegadores.
+   -------------------------------------------------------------------------- */
+.rbp-cuerpo select,
+.rbp-cuerpo input,
+.rbp-cuerpo textarea {
+  color-scheme: light dark;
+}
+[data-theme='dark'] .rbp-cuerpo select,
+[data-theme='dark'] .rbp-cuerpo input,
+[data-theme='dark'] .rbp-cuerpo textarea {
+  background-color: var(--surface-2);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+/* --------------------------------------------------------------------------
+   5. Aire arriba
+   Sin la barra propia de cada herramienta, el primer bloque quedaba pegado al
+   borde superior del armazón.
+   -------------------------------------------------------------------------- */
+.rbp-cuerpo > .wrap > .hero:first-child {
+  padding-top: 32px;
+}
+.rbp-cuerpo .main {
+  padding-top: 26px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Impresión
+   Las tiras de pasos son navegación: no van al PDF.
+   -------------------------------------------------------------------------- */
+@media print {
+  .rbp-cuerpo .side,
+  .rbp-cuerpo .progress-wrap {
+    display: none !important;
+  }
+  .rbp-cuerpo .app {
+    display: block;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 1040px) {
+  .rbp-cuerpo .progress-wrap,
+  .rbp-cuerpo .side {
+    top: 0;
+  }
+}

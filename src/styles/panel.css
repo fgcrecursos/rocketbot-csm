@@ -1,0 +1,520 @@
+/* ==========================================================================
+   PANEL DE CARTERA
+   ========================================================================== */
+
+.pn {
+  padding: 30px 26px 70px;
+  max-width: 1320px;
+}
+
+.pn-hero {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.pn-hero .eyebrow {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rb-red-txt);
+  display: block;
+  margin-bottom: 8px;
+}
+.pn-hero h1 {
+  font-size: clamp(23px, 3vw, 31px);
+  margin: 0;
+  font-weight: 800;
+}
+.pn-hero p {
+  color: var(--ink-2);
+  font-size: 14.5px;
+  margin: 7px 0 0;
+  max-width: 62ch;
+}
+.pn-hero-acc {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* ---------- Indicadores ---------- */
+.pn-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 13px;
+  margin-bottom: 26px;
+}
+.pn-kpi {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 15px 17px;
+  box-shadow: var(--shadow);
+  border-left: 3px solid var(--acc, var(--line));
+}
+.pn-kpi .l {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.pn-kpi .v {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 25px;
+  margin-top: 5px;
+  letter-spacing: -0.02em;
+}
+.pn-kpi .s {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 3px;
+}
+
+/* ---------- Tabla de cuentas ---------- */
+.pn-sec {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.pn-sec::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: var(--line-soft);
+}
+
+.pn-tabla-caja {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.pn-scroll {
+  overflow-x: auto;
+}
+.pn-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 940px;
+}
+.pn-tabla th {
+  text-align: left;
+  padding: 11px 14px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+.pn-tabla td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: middle;
+}
+.pn-tabla tr:last-child td {
+  border-bottom: none;
+}
+.pn-tabla tbody tr:hover {
+  background: var(--surface-2);
+}
+.pn-tabla .num {
+  text-align: right;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.pn-cuenta {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.pn-cuenta .ini {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--rb-red);
+  color: #fff;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 11.5px;
+}
+.pn-cuenta .n {
+  font-weight: 700;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pn-cuenta .m {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pn-cuenta.activa .n::after {
+  content: 'activa';
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--rb-green) 18%, transparent);
+  color: var(--rb-green);
+  padding: 2px 6px;
+  border-radius: 20px;
+  margin-left: 7px;
+  vertical-align: middle;
+}
+
+/* Puntaje con banda de color */
+.pn-score {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--b, var(--ink-3)) 14%, transparent);
+  color: var(--b, var(--ink-3));
+}
+.pn-score small {
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.pn-vacio {
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.pn-nivel {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: var(--surface-3);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+/* ---------- Acciones por fila ----------
+   Un botón por herramienta, visibles siempre. Esconderlos detrás de un menú
+   obliga a dos clics para lo que es la operación más frecuente del panel. */
+.pn-acc {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-end;
+}
+.pn-h {
+  width: 27px;
+  height: 27px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-3);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.14s, color 0.14s, border-color 0.14s;
+}
+.pn-h:hover {
+  border-color: var(--c);
+  color: var(--c);
+}
+/* Mismo criterio que los numerales de la barra lateral: los accents claros
+   llevan tinta oscura y solo el rojo lleva blanco. */
+.pn-h.lleno {
+  background: var(--c);
+  border-color: var(--c);
+  color: #0f171a;
+}
+.pn-h[data-c='1'].lleno {
+  color: #fff;
+}
+.pn-h[data-c='1'] {
+  --c: var(--rb-red);
+}
+.pn-h[data-c='2'] {
+  --c: var(--rb-blue);
+}
+.pn-h[data-c='3'] {
+  --c: var(--rb-green);
+}
+.pn-h[data-c='4'] {
+  --c: var(--rb-amber);
+}
+.pn-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--line);
+  margin: 0 3px;
+}
+.pn-ic {
+  width: 27px;
+  height: 27px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s, border-color 0.14s;
+}
+.pn-ic:hover {
+  border-color: var(--rb-blue);
+  color: var(--rb-blue);
+}
+.pn-ic.peligro:hover {
+  border-color: var(--rb-red);
+  color: var(--rb-red-txt);
+}
+
+/* ---------- Estado vacío ---------- */
+.pn-nada {
+  text-align: center;
+  padding: 56px 30px;
+}
+.pn-nada h3 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.pn-nada p {
+  color: var(--ink-2);
+  font-size: 14px;
+  max-width: 46ch;
+  margin: 0 auto 20px;
+}
+
+/* ---------- Lanzador de herramientas ---------- */
+.pn-tools {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 30px 0 0;
+}
+.pn-tool {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  padding: 20px 22px 18px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s;
+}
+.pn-tool::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--c);
+  z-index: 2;
+}
+.pn-tool::after {
+  content: attr(data-n);
+  position: absolute;
+  right: -4px;
+  bottom: -26px;
+  z-index: 0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 96px;
+  line-height: 1;
+  color: var(--c);
+  opacity: 0.06;
+  transition: opacity 0.25s var(--ease);
+}
+.pn-tool:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--c);
+}
+.pn-tool:hover::after {
+  opacity: 0.13;
+}
+.pn-tool h3 {
+  font-size: 15.5px;
+  margin: 0 0 6px;
+  position: relative;
+  z-index: 1;
+}
+.pn-tool p {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+.pn-tool .est {
+  margin-top: auto;
+  padding-top: 14px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c);
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+.pn-tool .est.vacio {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+/* --c pinta el filo, el numeral fantasma y el texto de estado. El texto es el
+   uso más exigente, así que se toma la variante -txt de cada color; como
+   relleno y como marca de agua al 6% de opacidad la diferencia no se nota. */
+.pn-tool[data-c='1'] {
+  --c: var(--rb-red-txt);
+}
+.pn-tool[data-c='2'] {
+  --c: var(--rb-blue-txt);
+}
+.pn-tool[data-c='3'] {
+  --c: var(--rb-green-txt);
+}
+.pn-tool[data-c='4'] {
+  --c: var(--rb-amber-txt);
+}
+
+/* ---------- Diálogo ---------- */
+.pn-dlg {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 0;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-lg);
+  max-width: 520px;
+  width: calc(100% - 32px);
+}
+.pn-dlg::backdrop {
+  background: rgba(15, 23, 26, 0.55);
+  backdrop-filter: blur(3px);
+}
+.pn-dlg-in {
+  padding: 24px 26px 22px;
+}
+.pn-dlg h3 {
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+.pn-dlg p {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  margin: 0 0 16px;
+}
+.pn-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.pn-campo label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.pn-campo input,
+.pn-campo select {
+  padding: 9px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+}
+.pn-campo input:focus,
+.pn-campo select:focus {
+  outline: none;
+  border-color: var(--rb-blue);
+}
+.pn-dlg-pie {
+  display: flex;
+  gap: 9px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+.pn-link {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.pn-link input {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 9px 11px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.pn-nota {
+  margin-top: 14px;
+  padding: 11px 13px;
+  border-radius: var(--r-sm);
+  border-left: 3px solid var(--rb-amber);
+  background: color-mix(in srgb, var(--rb-amber) 9%, transparent);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+@media (max-width: 1040px) {
+  .pn {
+    padding: 22px 14px 60px;
+  }
+  .pn-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pn-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 620px) {
+  .pn-kpis,
+  .pn-tools {
+    grid-template-columns: 1fr;
+  }
+}

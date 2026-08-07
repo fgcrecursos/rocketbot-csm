@@ -1,0 +1,99 @@
+<header class="topbar no-print">
+  <div class="topbar-in">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="8" fill="#BC0017"/>
+        <path d="M16 7c3.2 2.3 4.9 5.6 4.9 9.3 0 1.6-.3 3-.9 4.3h-8c-.6-1.3-.9-2.7-.9-4.3C11.1 12.6 12.8 9.3 16 7z" fill="#fff"/>
+        <circle cx="16" cy="14.6" r="1.9" fill="#BC0017"/>
+        <path d="M12.6 21.6h6.8l-1.3 3.4h-4.2l-1.3-3.4z" fill="#fff" opacity=".65"/>
+      </svg>
+      <div class="brand-txt">Customer Automation Health Score<small>Rocketbot · Customer Success</small></div>
+    </div>
+    <div class="tb-sp"></div>
+    <div class="tb-score" id="tbScore"><b id="tbVal">—</b><span id="tbBand">Sin datos</span></div>
+    <div class="tb-actions">
+      <button class="btn btn-icon btn-ghost" id="btnTheme" title="Cambiar tema" aria-label="Cambiar tema">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+      </button>
+      <button class="btn btn-sm btn-primary" id="btnPdf">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+        Exportar PDF
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow">Customer Success · Diagnóstico de cuenta</div>
+    <h1>Customer Automation <em>Health Score</em></h1>
+    <p class="sub">Qué tan saludable está la relación del cliente con Rocketbot, en un número de 0 a 100 que se puede comparar entre cuentas de cualquier tamaño.</p>
+    <div class="print-only" id="printHeader"></div>
+  </section>
+
+  <div class="card no-print" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding:14px 18px">
+    <div class="seg" id="modeSeg" role="group" aria-label="Profundidad de la evaluación">
+      <button type="button" data-mode="quick" aria-pressed="true">Rápida · 9 indicadores</button>
+      <button type="button" data-mode="full" aria-pressed="false">Completa · 18</button>
+    </div>
+    <span id="modeHint" style="font-size:12px; color:var(--faint)">Lo esencial para barrer una cartera.</span>
+    <div style="flex:1; min-width:12px"></div>
+    <button class="btn btn-sm" id="btnDemo">Cargar ejemplo</button>
+    <button class="btn btn-sm" id="btnClear">Limpiar</button>
+    <button class="btn btn-sm" id="btnSave">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+      Guardar
+    </button>
+    <button class="btn btn-sm" id="btnLoad">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Cargar
+    </button>
+    <input type="file" id="fileIn" accept="application/json" class="hidden">
+  </div>
+
+  <div class="card no-print" style="margin-top:16px">
+    <div class="card-h"><h2>Contexto de la cuenta</h2></div>
+    <p class="card-sub">Identifica la evaluación. No entra en el cálculo, salvo la fecha de renovación, que ordena la urgencia de las acciones.</p>
+    <div class="grid g3">
+      <div class="field"><label for="c_name">Cliente</label><input class="input" id="c_name" type="text" placeholder="Razón social"></div>
+      <div class="field"><label for="c_ind">Industria</label>
+        <select class="input" id="c_ind">
+          <option>Banca y Servicios Financieros</option><option>Seguros</option><option>Retail</option>
+          <option>Consumo Masivo (CPG)</option><option>Manufactura</option><option>Salud</option>
+          <option>Telecomunicaciones</option><option>Logística</option><option>Sector Público</option>
+          <option>Educación</option><option>Minería y Energía</option><option>Otra</option>
+        </select>
+      </div>
+      <div class="field"><label for="c_plan">Plan</label>
+        <select class="input" id="c_plan">
+          <option value="7990">Entry — USD 7.990</option>
+          <option value="14990" selected>Standard — USD 14.990</option>
+          <option value="24990">Enterprise — USD 24.990</option>
+          <option value="49990">Corporate — USD 49.990</option>
+          <option value="custom">Personalizado</option>
+        </select>
+      </div>
+      <div class="field"><label for="c_csm">Responsable de la cuenta</label><input class="input" id="c_csm" type="text" placeholder="CSM / Account Manager"></div>
+      <div class="field"><label for="c_start">Cliente desde</label><input class="input" id="c_start" type="month"></div>
+      <div class="field"><label for="c_renew">Fecha de renovación</label><input class="input" id="c_renew" type="date"></div>
+    </div>
+  </div>
+
+  <div class="cols" style="margin-top:16px">
+    <div>
+      <div class="card" id="cardUso"></div>
+      <div class="card" id="cardAdopcion"></div>
+      <div class="card" id="cardValor"></div>
+      <div class="card" id="cardRiesgo"></div>
+    </div>
+    <div>
+      <div class="sticky">
+        <div class="score-panel" id="scorePanel"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="report"></div>
+
+</div>

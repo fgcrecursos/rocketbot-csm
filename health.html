@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Score — Rocketbot</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/assets/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Mulish:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- La marca salió de acá: la pone el armazón. Estos nodos quedan porque el
+     motor se engancha a ellos en init(); health.js los muda a la barra
+     superior compartida apenas termina de inicializarse. -->
+<header class="topbar no-print" id="tbHealth" hidden>
+  <div class="topbar-in">
+    <div class="tb-score" id="tbScore"><b id="tbVal">—</b><span id="tbBand">Sin datos</span></div>
+    <div class="tb-actions">
+      <button class="btn btn-icon btn-ghost" id="btnTheme" hidden aria-hidden="true" tabindex="-1"></button>
+      <button class="btn btn-sm btn-primary" id="btnPdf">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+        Exportar PDF
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow">Customer Success · Diagnóstico de cuenta</div>
+    <h1>Customer Automation <em>Health Score</em></h1>
+    <p class="sub">Qué tan saludable está la relación del cliente con Rocketbot, en un número de 0 a 100 que se puede comparar entre cuentas de cualquier tamaño.</p>
+    <div class="print-only" id="printHeader"></div>
+  </section>
+
+  <div class="card no-print" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding:14px 18px">
+    <div class="seg" id="modeSeg" role="group" aria-label="Profundidad de la evaluación">
+      <button type="button" data-mode="quick" aria-pressed="true">Rápida · 9 indicadores</button>
+      <button type="button" data-mode="full" aria-pressed="false">Completa · 18</button>
+    </div>
+    <span id="modeHint" style="font-size:12px; color:var(--faint)">Lo esencial para barrer una cartera.</span>
+    <div style="flex:1; min-width:12px"></div>
+    <button class="btn btn-sm" id="btnDemo">Cargar ejemplo</button>
+    <button class="btn btn-sm" id="btnClear">Limpiar</button>
+    <button class="btn btn-sm" id="btnSave">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+      Guardar
+    </button>
+    <button class="btn btn-sm" id="btnLoad">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Cargar
+    </button>
+    <input type="file" id="fileIn" accept="application/json" class="hidden">
+  </div>
+
+  <div class="card no-print" style="margin-top:16px">
+    <div class="card-h"><h2>Contexto de la cuenta</h2></div>
+    <p class="card-sub">Identifica la evaluación. No entra en el cálculo, salvo la fecha de renovación, que ordena la urgencia de las acciones.</p>
+    <div class="grid g3">
+      <div class="field"><label for="c_name">Cliente</label><input class="input" id="c_name" type="text" placeholder="Razón social"></div>
+      <!-- Lista alineada con INDUSTRIAS de src/lib/modelo.js. Antes esta
+           herramienta ofrecía 12 industrias con otra redacción ("Retail",
+           "Logística") y las otras tres ofrecían 14, así que la misma cuenta
+           quedaba clasificada distinto según por dónde se cargara. -->
+      <div class="field"><label for="c_ind">Industria</label>
+        <select class="input" id="c_ind">
+          <option>Banca y servicios financieros</option><option>Seguros</option>
+          <option>Retail y consumo masivo</option><option>Manufactura</option>
+          <option>Salud</option><option>Logística y transporte</option>
+          <option>Minería y energía</option><option>Telecomunicaciones</option>
+          <option>Educación</option><option>Servicios profesionales</option>
+          <option>Sector público</option><option>Agroindustria</option>
+          <option>Construcción e inmobiliaria</option><option>Otra</option>
+        </select>
+      </div>
+      <div class="field"><label for="c_plan">Plan</label>
+        <select class="input" id="c_plan">
+          <option value="7990">Entry — USD 7.990</option>
+          <option value="14990" selected>Standard — USD 14.990</option>
+          <option value="24990">Enterprise — USD 24.990</option>
+          <option value="49990">Corporate — USD 49.990</option>
+          <option value="custom">Personalizado</option>
+        </select>
+      </div>
+      <div class="field"><label for="c_csm">Responsable de la cuenta</label><input class="input" id="c_csm" type="text" placeholder="CSM / Account Manager"></div>
+      <div class="field"><label for="c_start">Cliente desde</label><input class="input" id="c_start" type="month"></div>
+      <div class="field"><label for="c_renew">Fecha de renovación</label><input class="input" id="c_renew" type="date"></div>
+    </div>
+  </div>
+
+  <div class="cols" style="margin-top:16px">
+    <div>
+      <div class="card" id="cardUso"></div>
+      <div class="card" id="cardAdopcion"></div>
+      <div class="card" id="cardValor"></div>
+      <div class="card" id="cardRiesgo"></div>
+    </div>
+    <div>
+      <div class="sticky">
+        <div class="score-panel" id="scorePanel"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="report"></div>
+
+</div>
+
+<script type="module" src="/src/tools/health.js"></script>
+</body>
+</html>

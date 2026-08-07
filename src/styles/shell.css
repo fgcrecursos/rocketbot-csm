@@ -1,0 +1,623 @@
+/* ==========================================================================
+   ARMAZÓN COMPARTIDO
+   Barra lateral con la marca y las herramientas, barra superior con la cuenta
+   activa y las acciones de la herramienta. Todo lo que está fuera de
+   .rbp-cuerpo es de la plataforma; adentro manda el CSS de cada herramienta.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--display);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--rb-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Se aplica solo durante el cambio de tema. Ver aplicarTema() en shell.js. */
+.rbp-sin-transicion,
+.rbp-sin-transicion *,
+.rbp-sin-transicion *::before,
+.rbp-sin-transicion *::after {
+  transition: none !important;
+}
+
+.rbp-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Rejilla ---------- */
+.rbp {
+  display: grid;
+  grid-template-columns: var(--side-w) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* ---------- Barra lateral ---------- */
+.rbp-side {
+  background: var(--side);
+  color: var(--side-ink);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  /* Health Score pinta un velo con `body::before` en position:fixed. Sin un
+     contexto de apilamiento propio, ese velo queda por encima de la barra. */
+  z-index: 60;
+  height: 100vh;
+  padding: 20px 0 16px;
+  border-right: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.rbp-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 18px 18px;
+  border-bottom: 1px solid var(--side-line);
+}
+.rbp-brand img {
+  height: 22px;
+  width: auto;
+  flex: 0 0 auto;
+}
+.rbp-brand .t {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 12.5px;
+  color: #fff;
+  line-height: 1.25;
+}
+.rbp-brand .s {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+/* ---------- Selector de cuenta ---------- */
+.rbp-cuenta {
+  margin: 14px 12px 6px;
+  position: relative;
+}
+.rbp-cuenta-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: var(--r-md);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+.rbp-cuenta-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.rbp-cuenta-ini {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: var(--rb-red);
+  color: #fff;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.rbp-cuenta-txt {
+  min-width: 0;
+  flex: 1;
+}
+.rbp-cuenta-txt .n {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rbp-cuenta-txt .m {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rbp-cuenta-cv {
+  flex: 0 0 auto;
+  opacity: 0.5;
+  transition: transform 0.2s var(--ease);
+}
+.rbp-cuenta.abierto .rbp-cuenta-cv {
+  transform: rotate(180deg);
+}
+
+.rbp-cuenta-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 60;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  padding: 5px;
+  max-height: 340px;
+  overflow-y: auto;
+  display: none;
+}
+.rbp-cuenta.abierto .rbp-cuenta-menu {
+  display: block;
+}
+.rbp-cuenta-op {
+  width: 100%;
+  display: block;
+  text-align: left;
+  padding: 8px 10px;
+  border: 0;
+  background: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ink);
+}
+.rbp-cuenta-op:hover {
+  background: var(--surface-3);
+}
+.rbp-cuenta-op[aria-current='true'] {
+  background: color-mix(in srgb, var(--rb-red) 12%, transparent);
+  color: var(--rb-red-txt);
+  font-weight: 700;
+}
+.rbp-cuenta-op .sub {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  margin-top: 1px;
+}
+/* La opción activa lleva un fondo teñido de rojo que oscurece lo suficiente
+   como para dejar el subtítulo en 4.4:1. */
+.rbp-cuenta-op[aria-current='true'] .sub {
+  color: var(--ink-2);
+}
+.rbp-cuenta-sep {
+  height: 1px;
+  background: var(--line-soft);
+  margin: 5px 2px;
+}
+.rbp-cuenta-op.nueva {
+  color: var(--rb-blue-txt);
+  font-weight: 700;
+}
+
+/* ---------- Navegación ---------- */
+.rbp-nav {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+}
+.rbp-nav-tit {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  padding: 12px 12px 6px;
+}
+.rbp-nav-i {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  color: var(--side-ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.rbp-nav-i:hover {
+  background: var(--side-hover);
+  color: #fff;
+}
+.rbp-nav-i[aria-current='page'] {
+  background: rgba(255, 255, 255, 0.11);
+  color: #fff;
+}
+.rbp-nav-n {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #fff;
+  width: 21px;
+  height: 21px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.16);
+}
+/* Numeral blanco sobre azul, verde o ámbar de marca no llega a 4.5:1 en un
+   texto de 9,5px —en oscuro cae hasta 2:1—, y esos tres accents son claros por
+   definición. Se invierte el texto a tinta oscura, que sobre ellos da entre
+   4.6:1 y 8.4:1 en los dos temas. El rojo es el único lo bastante oscuro para
+   llevar blanco, y así se queda. */
+.rbp-nav-i[data-c='1'] .rbp-nav-n {
+  background: var(--rb-red);
+  color: #fff;
+}
+.rbp-nav-i[data-c='2'] .rbp-nav-n {
+  background: var(--rb-blue);
+  color: #0f171a;
+}
+.rbp-nav-i[data-c='3'] .rbp-nav-n {
+  background: var(--rb-green);
+  color: #0f171a;
+}
+.rbp-nav-i[data-c='4'] .rbp-nav-n {
+  background: var(--rb-amber);
+  color: #0f171a;
+}
+/* Punto que indica que esa herramienta ya tiene datos para la cuenta activa */
+.rbp-nav-pt {
+  margin-left: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rb-green);
+  flex: 0 0 auto;
+  opacity: 0;
+}
+.rbp-nav-i.con-datos .rbp-nav-pt {
+  opacity: 1;
+}
+
+/* ---------- Pie de la barra lateral ---------- */
+.rbp-side-pie {
+  padding: 12px 16px 0;
+  border-top: 1px solid var(--side-line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rbp-side-btn {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--side-ink);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.rbp-side-btn:hover {
+  background: var(--side-hover);
+  color: #fff;
+}
+.rbp-side-modo {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  text-align: center;
+}
+
+/* ---------- Barra superior ---------- */
+.rbp-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.rbp-top {
+  position: sticky;
+  top: 0;
+  z-index: 45;
+  min-height: var(--top-h);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 22px;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.rbp-top-tit {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rbp-top-tit small {
+  display: block;
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 9.5px;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.rbp-top-sp {
+  flex: 1;
+}
+.rbp-top-acc {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Estado de guardado */
+.rbp-estado {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.rbp-estado i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  flex: 0 0 auto;
+  transition: background 0.2s;
+}
+.rbp-estado[data-e='guardando'] i {
+  background: var(--rb-amber);
+  animation: rbp-pulso 1s infinite;
+}
+.rbp-estado[data-e='guardado'] i {
+  background: var(--rb-green);
+}
+.rbp-estado[data-e='error'] i {
+  background: var(--rb-red);
+}
+@keyframes rbp-pulso {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Botón genérico de la plataforma */
+.rbp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+.rbp-btn:hover {
+  background: var(--surface-3);
+  border-color: var(--ink-3);
+}
+.rbp-btn-primario {
+  background: var(--rb-red);
+  border-color: var(--rb-red);
+  color: #fff;
+}
+.rbp-btn-primario:hover {
+  background: var(--rb-red-deep);
+  border-color: var(--rb-red-deep);
+}
+
+/* ---------- Cuerpo ---------- */
+.rbp-cuerpo {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Aviso cuando no hay cuenta activa */
+.rbp-sin-cuenta {
+  margin: 28px auto;
+  max-width: 620px;
+  text-align: center;
+  padding: 40px 30px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+.rbp-sin-cuenta h2 {
+  font-size: 19px;
+  margin: 0 0 8px;
+}
+.rbp-sin-cuenta p {
+  color: var(--ink-2);
+  font-size: 14px;
+  margin: 0 0 20px;
+}
+
+/* ---------- Avisos flotantes ---------- */
+.rbp-avisos {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+.rbp-aviso {
+  background: var(--rb-secondary);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  animation: rbp-sube 0.25s var(--ease);
+}
+.rbp-aviso[data-t='error'] {
+  background: var(--rb-red);
+}
+.rbp-aviso[data-t='ok'] {
+  background: var(--rb-green-deep);
+}
+@keyframes rbp-sube {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1040px) {
+  .rbp {
+    grid-template-columns: 1fr;
+  }
+  .rbp-side {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 3px solid var(--rb-red);
+  }
+  .rbp-brand {
+    border: 0;
+    padding: 0;
+    flex: 0 0 auto;
+  }
+  .rbp-brand .txt {
+    display: none;
+  }
+  .rbp-cuenta {
+    margin: 0;
+    flex: 0 0 190px;
+  }
+  .rbp-nav {
+    flex-direction: row;
+    padding: 0;
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+  .rbp-nav-tit {
+    display: none;
+  }
+  .rbp-nav-i {
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+  .rbp-side-pie {
+    border: 0;
+    padding: 0;
+    margin-left: auto;
+    flex: 0 0 auto;
+    flex-direction: row;
+  }
+  .rbp-side-modo {
+    display: none;
+  }
+  .rbp-side-btn {
+    width: auto;
+    padding: 8px 11px;
+  }
+  .rbp-top {
+    padding: 9px 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Impresión ----------
+   Los informes en PDF son parte del producto: la plataforma desaparece y
+   queda solo el contenido de la herramienta. */
+@media print {
+  .rbp-side,
+  .rbp-top,
+  .rbp-avisos,
+  .no-print {
+    display: none !important;
+  }
+  .rbp {
+    display: block;
+  }
+  .rbp-main {
+    display: block;
+  }
+}

@@ -1,0 +1,98 @@
+# Centro CSM — Rocketbot
+
+Plataforma interna de Customer Success. Reúne las cuatro herramientas de
+diagnóstico que antes eran archivos HTML sueltos, con una cartera de cuentas
+compartida y un enlace para que el cliente complete lo suyo.
+
+```bash
+npm install
+npm run dev      # http://localhost:5187
+```
+
+## Las herramientas
+
+| # | Herramienta | Qué responde | Enlace al cliente |
+|---|---|---|---|
+| 01 | Customer Automation Health Score | Qué tan saludable está la cuenta, de 0 a 100 | no |
+| 02 | AI Readiness Assessment | Si una iniciativa de IA va a funcionar en esa organización | sí |
+| 03 | Automation Opportunity Finder | Qué procesos conviene automatizar primero | sí |
+| 04 | Roadmap de Automatización | En qué orden se hacen y cómo se presentan | no |
+
+## Cómo está armado
+
+Los cuatro motores de cálculo vienen de los HTML originales y **no se
+modifican**. `scripts/extraer-motores.mjs` los separa en CSS, cuerpo y
+JavaScript, y les agrega al final un puente que vuelve a exponer en `window` lo
+que el ámbito de módulo dejaría privado. Alrededor de eso:
+
+```
+index.html            cartera de cuentas
+health · madurez · oportunidades · roadmap    una página por herramienta
+publico.html          lo que ve el cliente invitado
+
+src/lib/modelo.js      catálogos canónicos, forma de una cuenta, puentes por herramienta
+src/lib/almacen.js     una interfaz, dos respaldos (localStorage / Supabase)
+src/lib/shell.js       barra lateral, barra superior, cuenta activa, tema
+src/lib/puente-motor.js  enganches para enterarse de que el motor cambió algo
+src/styles/tokens.css  única fuente de color y tipografía
+src/styles/parches.css ajustes de las herramientas heredadas, agrupados por motivo
+supabase/schema.sql    tablas, RLS y las dos funciones del acceso por token
+```
+
+Los scripts de `scripts/` se corrieron una vez para arrancar. Lo que generaron
+ya es la fuente y se edita a mano; volver a correrlos pisa los ajustes
+posteriores.
+
+### Lo que comparten las herramientas
+
+Una cuenta guarda un solo perfil —industria, país, tamaño, ERP, CRM, costo
+hora, plan, renovación— y las cuatro leen de ahí. Cargar la industria en
+cualquiera de ellas la deja disponible en las otras tres.
+
+El nombre de la cuenta viaja en un solo sentido, de la cuenta a la herramienta.
+Health Score y Roadmap tienen un campo de texto libre para el cliente, y si ese
+campo escribiera de vuelta, corregir una tilde ahí renombraría la cuenta real.
+
+Además, el Roadmap importa con un botón los procesos que ya relevó el
+Opportunity Finder, con su volumetría; quedan pendientes de calificar impacto y
+complejidad, que es lo único que el Finder no mide.
+
+## Base de datos
+
+Sin credenciales, todo se guarda en `localStorage` y la plataforma funciona
+completa salvo por una cosa: **el enlace al cliente solo existe en ese
+navegador**, así que todavía no sirve para mandárselo a nadie.
+
+Para conectar Supabase:
+
+1. Correr `supabase/schema.sql` en el SQL Editor.
+2. Copiar `.env.example` a `.env` y completar las dos variables.
+3. Reiniciar el dev server.
+
+No hay que tocar código: `src/lib/almacen.js` elige el respaldo según haya o no
+credenciales. Para probar en local con Supabase ya configurado,
+`localStorage.setItem('rbcsm.forzarLocal','1')`.
+
+### Acceso del cliente invitado
+
+El cliente no está autenticado y las tablas tienen RLS sin política para `anon`.
+Su único acceso son dos funciones `security definer` que reciben el token, lo
+validan del lado del servidor y tocan nada más que la evaluación de esa
+invitación: `csm_invitacion_abrir` y `csm_invitacion_guardar`.
+
+## Notas de diseño
+
+Los tokens de color salen del sitio rocketbot.com, no de los prototipos: los
+cuatro archivos originales traían tres paletas distintas y el rojo cambiaba de
+valor entre ellos. El logo es el archivo real del sitio, no la letra dibujada
+que usaban los prototipos.
+
+Cada accent de marca existe en dos variantes porque cumple dos papeles con
+exigencias opuestas: `--rb-blue` como relleno y `--rb-blue-txt` como texto. El
+detalle está comentado en `tokens.css`. Las herramientas heredadas no se
+reescribieron: `parches.css` redefine las variables sobre los elementos que las
+usan, lo que alcanza incluso cuando el color viene de un estilo en línea que
+escribe el motor.
+
+Ambos temas pasan el contraste mínimo AA (4.5:1 para texto normal, 3:1 para
+texto grande) en las seis páginas, con y sin datos cargados.

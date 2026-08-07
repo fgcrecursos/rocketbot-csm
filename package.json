@@ -1,0 +1,19 @@
+{
+  "name": "rocketbot-csm",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Plataforma de herramientas de Customer Success de Rocketbot",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5187",
+    "extraer": "node scripts/extraer-motores.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4"
+  },
+  "devDependencies": {
+    "vite": "^5.4.8"
+  }
+}

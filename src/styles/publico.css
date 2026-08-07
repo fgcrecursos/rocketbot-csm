@@ -1,0 +1,134 @@
+/* ==========================================================================
+   VISTA PÚBLICA
+   Lo que ve el cliente. Sin barra lateral ni cartera: solo la marca, la
+   herramienta y el aviso de que se guarda solo.
+   ========================================================================== */
+
+/* La barra de esta vista es más baja que la del armazón interno. parches.css
+   calcula contra --top-h el `top` de la tira de pasos, así que se ajusta acá
+   en vez de duplicar la regla. */
+:root {
+  --top-h: 50px;
+}
+
+.pu-top {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: var(--top-h);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 24px;
+  background: var(--rb-secondary);
+  color: #fff;
+  border-bottom: 3px solid var(--rb-red);
+}
+.pu-logo {
+  height: 24px;
+  width: auto;
+  flex: 0 0 auto;
+  /* El archivo de marca es oscuro; sobre la barra gris va en blanco. */
+  filter: brightness(0) invert(1);
+}
+.pu-top-txt {
+  min-width: 0;
+}
+.pu-top-txt .t {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pu-top-txt .s {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9fb0b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pu-estado {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: #9fb0b8;
+  white-space: nowrap;
+}
+.pu-estado i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5f717a;
+  flex: 0 0 auto;
+  transition: background 0.2s;
+}
+.pu-estado[data-e='guardando'] i {
+  background: var(--rb-amber);
+}
+.pu-estado[data-e='guardado'] i {
+  background: var(--rb-green);
+}
+.pu-estado[data-e='error'] i {
+  background: var(--rb-red);
+}
+
+.pu-pie {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 22px 24px 60px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  line-height: 1.6;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* ---------- Pantallas de borde ---------- */
+.pu-borde {
+  max-width: 480px;
+  margin: 14vh auto;
+  text-align: center;
+  padding: 42px 32px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+.pu-logo-borde {
+  height: 26px;
+  width: auto;
+  margin-bottom: 22px;
+}
+.pu-borde h1 {
+  font-size: 21px;
+  margin: 0 0 10px;
+}
+.pu-borde p {
+  color: var(--ink-2);
+  font-size: 14.5px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 620px) {
+  .pu-top {
+    padding: 11px 14px;
+  }
+  .pu-estado span {
+    display: none;
+  }
+}
+
+@media print {
+  .pu-top,
+  .pu-pie {
+    display: none !important;
+  }
+}

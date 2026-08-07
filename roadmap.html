@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roadmap de Automatización — Rocketbot</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/assets/logos/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Mulish:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="app">
+  <!-- Recorrido interno de la herramienta. parches.css lo convierte en una
+       tira horizontal bajo la barra del armazón. El botón de tema que había
+       acá se quitó: el tema es de la plataforma. -->
+  <aside class="side no-print">
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="side-prog"><i id="prog" style="width:0%"></i></div>
+      <div class="lbl" id="progTxt">Sin procesos</div>
+    </div>
+  </aside>
+
+  <main class="main" id="main"></main>
+</div>
+
+<script type="module" src="/src/tools/roadmap.js"></script>
+</body>
+</html>
