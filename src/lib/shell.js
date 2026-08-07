@@ -12,6 +12,7 @@
 
 import { almacen } from './almacen.js';
 import { HERRAMIENTAS, herramienta, iniciales, PUENTES } from './modelo.js';
+import { requiereLogin, sesionActual, perfilActual, cerrarSesion } from './auth.js';
 
 const LOGO_BLANCO = '/assets/logos/logo-header-white.png';
 
@@ -73,7 +74,7 @@ export function avisar(msg, tipo = 'info', ms = 2600) {
 const CHEVRON =
   '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
 
-function barraLateral(idActiva, cuenta, cuentas, estado) {
+function barraLateral(idActiva, cuenta, cuentas, estado, perfil) {
   const ini = cuenta ? iniciales(cuenta.nombre) : '—';
   const nombre = cuenta ? cuenta.nombre || 'Cuenta sin nombre' : 'Sin cuenta activa';
   const sub = cuenta
@@ -137,7 +138,16 @@ function barraLateral(idActiva, cuenta, cuentas, estado) {
     </nav>
 
     <div class="rbp-side-pie">
+      ${
+        perfil
+          ? `<div class="rbp-perfil">
+               <div class="n">${esc(perfil.nombre)}</div>
+               <div class="p">${esc(perfil.puesto || perfil.email)}</div>
+             </div>`
+          : ''
+      }
       <button class="rbp-side-btn" id="rbpTema"><span data-rbp-tema-txt>Modo oscuro</span></button>
+      ${requiereLogin ? '<button class="rbp-side-btn" id="rbpSalir">Cerrar sesión</button>' : ''}
       <div class="rbp-side-modo">Datos: ${almacen.modo}</div>
     </div>
   </aside>`;
@@ -172,6 +182,17 @@ const esc = (s) =>
  * @returns {Promise<object>} contexto para la herramienta
  */
 export async function montarShell({ herramienta: idHerr, exigeCuenta = true }) {
+  // La guardia va antes que cualquier otra cosa: sin sesión no hay cuentas que
+  // mostrar. Si redirige, se cuelga a propósito con una promesa que nunca
+  // resuelve — el llamador tiene un `await montarShell(...)` seguido de más
+  // trabajo (cargar el motor, restaurar datos), y nada de eso debe correr
+  // mientras el navegador procesa el redirect.
+  if (requiereLogin && !(await sesionActual())) {
+    location.replace('/login.html?volver=' + encodeURIComponent(location.pathname + location.search));
+    await new Promise(() => {});
+  }
+  perfilCache = requiereLogin ? await perfilActual() : null;
+
   temaInicial();
 
   const h = idHerr === 'panel' ? null : herramienta(idHerr);
@@ -192,7 +213,7 @@ export async function montarShell({ herramienta: idHerr, exigeCuenta = true }) {
   cuerpo.className = 'rbp-cuerpo';
   while (document.body.firstChild) cuerpo.appendChild(document.body.firstChild);
 
-  document.body.innerHTML = `<div class="rbp">${barraLateral(idHerr, cuenta, cuentas, estado)}
+  document.body.innerHTML = `<div class="rbp">${barraLateral(idHerr, cuenta, cuentas, estado, perfilCache)}
     <div class="rbp-main">${barraSuperior(h)}</div></div>`;
   document.querySelector('.rbp-main').appendChild(cuerpo);
 
@@ -272,6 +293,11 @@ async function crearCuenta() {
    llama tenga que volver a decirlo. */
 let herrActual = 'panel';
 
+/* El perfil del usuario logueado, cargado una vez en montarShell(). No cambia
+   durante la sesión, así que refrescarBarra() lo reutiliza en vez de
+   volver a pedirlo cada vez que se crea o edita una cuenta. */
+let perfilCache = null;
+
 /**
  * Redibuja la barra lateral con las cuentas y los estados actuales.
  *
@@ -288,7 +314,7 @@ export async function refrescarBarra() {
   const estado = cuenta ? await almacen.estadoDeCuenta(cuenta.id) : null;
 
   const molde = document.createElement('div');
-  molde.innerHTML = barraLateral(herrActual, cuenta, cuentas, estado);
+  molde.innerHTML = barraLateral(herrActual, cuenta, cuentas, estado, perfilCache);
   vieja.replaceWith(molde.firstElementChild);
   cablearBarra();
 }
@@ -331,6 +357,15 @@ function cablearBarra() {
   });
   const nueva = document.getElementById('rbpNuevaCuenta');
   if (nueva) nueva.addEventListener('click', crearCuenta);
+
+  const salir = document.getElementById('rbpSalir');
+  if (salir) {
+    salir.addEventListener('click', async () => {
+      salir.disabled = true;
+      await cerrarSesion();
+      location.href = '/login.html';
+    });
+  }
 }
 
 /** Autoguardado con espera: no escribe en cada tecla. */

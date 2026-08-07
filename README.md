@@ -28,15 +28,17 @@ que el ámbito de módulo dejaría privado. Alrededor de eso:
 ```
 index.html            cartera de cuentas
 health · madurez · oportunidades · roadmap    una página por herramienta
+login.html             login / auto-registro del equipo (solo existe en modo Supabase)
 publico.html          lo que ve el cliente invitado
 
 src/lib/modelo.js      catálogos canónicos, forma de una cuenta, puentes por herramienta
 src/lib/almacen.js     una interfaz, dos respaldos (localStorage / Supabase)
-src/lib/shell.js       barra lateral, barra superior, cuenta activa, tema
+src/lib/auth.js        sesión del equipo (Supabase Auth); no hace nada en modo local
+src/lib/shell.js       barra lateral, barra superior, cuenta activa, tema, guardia de sesión
 src/lib/puente-motor.js  enganches para enterarse de que el motor cambió algo
 src/styles/tokens.css  única fuente de color y tipografía
 src/styles/parches.css ajustes de las herramientas heredadas, agrupados por motivo
-supabase/schema.sql    tablas, RLS y las dos funciones del acceso por token
+supabase/schema.sql    tablas, RLS, perfiles del equipo y las funciones del acceso por token
 ```
 
 Los scripts de `scripts/` se corrieron una vez para arrancar. Lo que generaron
@@ -72,6 +74,22 @@ Para conectar Supabase:
 No hay que tocar código: `src/lib/almacen.js` elige el respaldo según haya o no
 credenciales. Para probar en local con Supabase ya configurado,
 `localStorage.setItem('rbcsm.forzarLocal','1')`.
+
+### Login del equipo
+
+En modo Supabase, `index.html`/`health.html`/etc. exigen sesión: sin ella
+redirigen a `login.html`. El alta es de **auto-registro** — cualquiera que
+llegue a esa pantalla puede crear su cuenta con nombre, email, puesto y
+contraseña, sin aprobación de un admin ni restricción de dominio de correo. Es
+la política que se acordó al conectar la base: prioriza que el equipo se sume
+solo por sobre cerrar el acceso.
+
+El perfil (`csm_perfiles`) se puebla solo: un trigger en `auth.users` copia
+`nombre`/`puesto` de los metadatos que manda `signUp()`. Ver el motivo completo
+en el comentario de `csm_crear_perfil()` en `schema.sql`.
+
+La vista pública (`publico.html`) no pasa por esta guardia — el cliente
+invitado nunca ve la pantalla de login del equipo.
 
 ### Acceso del cliente invitado
 

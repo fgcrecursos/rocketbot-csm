@@ -284,6 +284,14 @@ const respaldo = hayCredenciales && !forzadoLocal ? respaldoSupabase : respaldoL
 
 export const modo = respaldo.nombre;
 
+/**
+ * El cliente de Supabase, para lo que el almacén no cubre (hoy, el login).
+ * Devuelve el mismo singleton que usa el resto del almacén — Supabase avisa
+ * si hay dos instancias de GoTrue mirando el mismo storage, así que auth.js no
+ * crea la suya. En modo local devuelve null: no hay nada que autenticar.
+ */
+export const clienteSupabase = () => (modo === 'supabase' ? respaldoSupabase.cliente() : null);
+
 export const almacen = {
   modo: respaldo.nombre,
 

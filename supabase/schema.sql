@@ -74,6 +74,58 @@ create table if not exists public.csm_invitaciones (
 create index if not exists csm_invitaciones_cuenta_idx
   on public.csm_invitaciones (cuenta_id);
 
+-- ---------- Perfiles del equipo ----------
+-- Una fila por cuenta de Supabase Auth. El registro es de auto-alta: cualquiera
+-- que llegue a la pantalla de login puede crear la suya con nombre, email y
+-- puesto. No hay aprobación de un admin ni restricción de dominio de correo;
+-- si más adelante se necesita, es acá donde se agregaría.
+create table if not exists public.csm_perfiles (
+  id      uuid primary key references auth.users (id) on delete cascade,
+  nombre  text not null,
+  email   text not null,
+  puesto  text default '',
+  creado  timestamptz not null default now()
+);
+
+alter table public.csm_perfiles enable row level security;
+
+-- Cualquier miembro del equipo puede ver el directorio del equipo (para saber
+-- quién es el CSM de una cuenta, por ejemplo), pero solo edita su propia fila.
+drop policy if exists csm_perfiles_leer on public.csm_perfiles;
+create policy csm_perfiles_leer on public.csm_perfiles
+  for select to authenticated using (true);
+
+drop policy if exists csm_perfiles_editar_propio on public.csm_perfiles;
+create policy csm_perfiles_editar_propio on public.csm_perfiles
+  for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
+
+-- El perfil se crea solo, disparado por el alta en auth.users. `nombre` y
+-- `puesto` viajan en los metadatos que manda signUp() desde el cliente; si
+-- llegaran vacíos (alta por otra vía), el nombre cae al email para que la
+-- fila nunca quede con nombre en blanco.
+create or replace function public.csm_crear_perfil()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.csm_perfiles (id, nombre, email, puesto)
+  values (
+    new.id,
+    coalesce(nullif(new.raw_user_meta_data->>'nombre', ''), new.email),
+    new.email,
+    coalesce(new.raw_user_meta_data->>'puesto', '')
+  );
+  return new;
+end;
+$$;
+
+drop trigger if exists csm_on_auth_user_created on auth.users;
+create trigger csm_on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.csm_crear_perfil();
+
 -- ==========================================================================
 -- Seguridad
 -- --------------------------------------------------------------------------

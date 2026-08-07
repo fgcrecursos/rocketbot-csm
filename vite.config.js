@@ -15,6 +15,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         panel: resolve(__dirname, 'index.html'),
+        login: resolve(__dirname, 'login.html'),
         health: resolve(__dirname, 'health.html'),
         madurez: resolve(__dirname, 'madurez.html'),
         oportunidades: resolve(__dirname, 'oportunidades.html'),
