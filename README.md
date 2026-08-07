@@ -98,6 +98,34 @@ Su único acceso son dos funciones `security definer` que reciben el token, lo
 validan del lado del servidor y tocan nada más que la evaluación de esa
 invitación: `csm_invitacion_abrir` y `csm_invitacion_guardar`.
 
+## Despliegue
+
+Vercel se conectó solo al repo de GitHub y arma un proyecto (`rocketbot-csm`,
+https://rocketbot-csm.vercel.app) apenas hay un push a `main`. **El build no
+hereda `.env`** — Vite lo lee en build time y `.env` está en `.gitignore`, así
+que sin este paso el sitio compila en modo local: nadie ve el login, y cada
+visitante escribe en el localStorage de su propio navegador sin saberlo. Pasó
+una vez (2026-08-07) y así se detectó.
+
+Después de correr `supabase/schema.sql`, cargar las mismas dos variables de
+`.env` en Vercel:
+
+```bash
+vercel link --yes --project rocketbot-csm
+printf '<url>' | vercel env add VITE_SUPABASE_URL production
+printf '<anon key>' | vercel env add VITE_SUPABASE_ANON_KEY production
+vercel --prod --yes   # las env vars nuevas no aplican a un build ya hecho
+```
+
+Confirmar que prendió mirando el bundle servido, no solo la consola de Vercel
+—`vercel env ls` puede mostrar la variable cargada y aun así el deploy vigente
+ser uno anterior sin ella—:
+
+```bash
+curl -s https://rocketbot-csm.vercel.app/ | grep -o '/assets/almacen-[^"]*\.js'
+curl -s https://rocketbot-csm.vercel.app/assets/almacen-XXXX.js | grep -o 'https://[a-z0-9]*\.supabase\.co'
+```
+
 ## Notas de diseño
 
 Los tokens de color salen del sitio rocketbot.com, no de los prototipos: los
