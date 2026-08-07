@@ -16,6 +16,7 @@ export default defineConfig({
       input: {
         panel: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'login.html'),
+        confirmado: resolve(__dirname, 'confirmado.html'),
         health: resolve(__dirname, 'health.html'),
         madurez: resolve(__dirname, 'madurez.html'),
         oportunidades: resolve(__dirname, 'oportunidades.html'),

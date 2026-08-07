@@ -60,13 +60,22 @@ export async function iniciarSesion(email, password) {
  * Si el proyecto de Supabase tiene la confirmación de email activada (es el
  * valor por defecto), `data.session` viene null hasta que la persona confirme
  * desde su correo — se lo señala devolviendo `confirmarEmail:true`.
+ *
+ * `emailRedirectTo` usa `location.origin` en vez de una URL fija porque el
+ * mismo código de alta corre en local (localhost:5187) y en producción
+ * (rocketbot-csm.vercel.app); las dos están cargadas en la lista de Redirect
+ * URLs del proyecto de Supabase, y una que no esté en esa lista Supabase la
+ * ignora silenciosamente y cae al Site URL en su lugar.
  */
 export async function registrarse({ nombre, email, puesto, password }) {
   const sb = await clienteSupabase();
   const { data, error } = await sb.auth.signUp({
     email,
     password,
-    options: { data: { nombre, puesto: puesto || '' } },
+    options: {
+      data: { nombre, puesto: puesto || '' },
+      emailRedirectTo: `${location.origin}/confirmado.html`,
+    },
   });
   if (error) throw error;
   return { session: data.session, confirmarEmail: !data.session };

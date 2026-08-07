@@ -29,6 +29,7 @@ que el ámbito de módulo dejaría privado. Alrededor de eso:
 index.html            cartera de cuentas
 health · madurez · oportunidades · roadmap    una página por herramienta
 login.html             login / auto-registro del equipo (solo existe en modo Supabase)
+confirmado.html        a dónde vuelve el link del email de confirmación
 publico.html          lo que ve el cliente invitado
 
 src/lib/modelo.js      catálogos canónicos, forma de una cuenta, puentes por herramienta
@@ -90,6 +91,28 @@ en el comentario de `csm_crear_perfil()` en `schema.sql`.
 
 La vista pública (`publico.html`) no pasa por esta guardia — el cliente
 invitado nunca ve la pantalla de login del equipo.
+
+### Confirmación de email
+
+`registrarse()` manda `emailRedirectTo: location.origin + '/confirmado.html'`,
+así que el link del correo vuelve a un origen u otro según desde dónde se haya
+registrado la persona (local o producción) sin hardcodear ninguno de los dos.
+
+Para que Supabase acepte ese redirect hay que tenerlo cargado en
+**Authentication → URL Configuration → Redirect URLs** del proyecto — si no
+está en esa lista, Supabase lo ignora en silencio y cae al Site URL en su
+lugar, sin avisar de ningún error. Hoy están cargadas:
+
+```
+https://rocketbot-csm.vercel.app/confirmado.html
+http://localhost:5187/confirmado.html
+```
+
+`confirmado.html` cubre los dos formatos con los que Supabase puede volver
+—hash implícito (`#access_token=...`, el que usa este proyecto por default,
+sesión creada sola por `detectSessionInUrl`) o PKCE (`?code=...`, canjeado a
+mano con `exchangeCodeForSession`)— y también el caso de link vencido o ya
+usado, que llega como `error_description` en la URL en vez de una sesión.
 
 ### Acceso del cliente invitado
 

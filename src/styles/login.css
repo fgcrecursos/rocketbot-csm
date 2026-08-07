@@ -128,3 +128,64 @@ body {
   color: var(--ink-3);
   margin-top: 18px;
 }
+
+/* ==========================================================================
+   CONFIRMACIÓN DE EMAIL (confirmado.html)
+   Misma tarjeta que el login; acá se centra el contenido en vez de mostrar
+   un formulario.
+   ========================================================================== */
+.lg-tarjeta.cf-centro {
+  text-align: center;
+}
+
+.cf-icono {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.cf-icono svg {
+  width: 26px;
+  height: 26px;
+}
+.cf-icono.cf-ok {
+  background: color-mix(in srgb, var(--rb-green) 15%, transparent);
+  color: var(--rb-green-txt);
+}
+.cf-icono.cf-mal {
+  background: color-mix(in srgb, var(--rb-red) 12%, transparent);
+  color: var(--rb-red-txt);
+}
+.cf-icono.cf-espera {
+  background: var(--surface-2);
+  color: var(--ink-3);
+}
+.cf-icono.cf-espera svg {
+  animation: cf-girar 0.9s linear infinite;
+}
+@keyframes cf-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cf-icono.cf-espera svg {
+    animation: none;
+  }
+}
+
+.lg-tarjeta h1 {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+.lg-tarjeta p {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.55;
+  margin: 0 0 20px;
+}
