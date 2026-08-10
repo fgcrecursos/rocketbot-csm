@@ -22,6 +22,7 @@ export default defineConfig({
         oportunidades: resolve(__dirname, 'oportunidades.html'),
         roadmap: resolve(__dirname, 'roadmap.html'),
         publico: resolve(__dirname, 'publico.html'),
+        equipo: resolve(__dirname, 'equipo.html'),
       },
     },
   },
