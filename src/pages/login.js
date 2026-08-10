@@ -117,6 +117,8 @@ function mensaje(tipo, texto) {
 /** Supabase Auth devuelve mensajes en inglés; se traducen los más comunes. */
 function traducirError(e) {
   const m = String(e && e.message || e);
+  if (m === 'CSM_NO_AUTORIZADO') return 'Ese email no tiene acceso a Centro CSM.';
+  if (/no está autorizado a crear una cuenta/i.test(m)) return 'Ese email no tiene acceso a Centro CSM.';
   if (/Invalid login credentials/i.test(m)) return 'Email o contraseña incorrectos.';
   if (/User already registered/i.test(m)) return 'Ya existe una cuenta con ese email. Iniciá sesión.';
   if (/Password should be at least/i.test(m)) return 'La contraseña necesita al menos 8 caracteres.';

@@ -12,7 +12,7 @@
 
 import { almacen } from './almacen.js';
 import { HERRAMIENTAS, herramienta, iniciales, PUENTES } from './modelo.js';
-import { requiereLogin, sesionActual, perfilActual, cerrarSesion } from './auth.js';
+import { requiereLogin, sesionActual, perfilActual, cerrarSesion, esSupervisor } from './auth.js';
 
 const LOGO_BLANCO = '/assets/logos/logo-header-white.png';
 
@@ -135,6 +135,13 @@ function barraLateral(idActiva, cuenta, cuentas, estado, perfil) {
       <a class="rbp-nav-i" href="/index.html" ${idActiva === 'panel' ? 'aria-current="page"' : ''}>
         <span class="rbp-nav-n">◫</span>Panel
       </a>
+      ${
+        esSupervisor(perfil)
+          ? `<a class="rbp-nav-i" href="/equipo.html" ${idActiva === 'equipo' ? 'aria-current="page"' : ''}>
+               <span class="rbp-nav-n">☺</span>Equipo
+             </a>`
+          : ''
+      }
     </nav>
 
     <div class="rbp-side-pie">
@@ -153,12 +160,12 @@ function barraLateral(idActiva, cuenta, cuentas, estado, perfil) {
   </aside>`;
 }
 
-function barraSuperior(h) {
+function barraSuperior(h, idHerr) {
+  const titulo = h ? h.nombre : idHerr === 'equipo' ? 'Equipo' : 'Centro CSM';
+  const sub = h ? 'Herramienta 0' + h.n : idHerr === 'equipo' ? 'Estado de las cuentas' : 'Cartera de cuentas';
   return `
   <header class="rbp-top no-print">
-    <div class="rbp-top-tit">${esc(h ? h.nombre : 'Centro CSM')}<small>${esc(
-      h ? 'Herramienta 0' + h.n : 'Cartera de cuentas'
-    )}</small></div>
+    <div class="rbp-top-tit">${esc(titulo)}<small>${esc(sub)}</small></div>
     <div class="rbp-top-sp"></div>
     <div class="rbp-estado" id="rbpEstado" data-e="limpio"><i></i><span>Sin cambios</span></div>
     <div class="rbp-top-acc" id="rbpAcciones"></div>
@@ -195,7 +202,7 @@ export async function montarShell({ herramienta: idHerr, exigeCuenta = true }) {
 
   temaInicial();
 
-  const h = idHerr === 'panel' ? null : herramienta(idHerr);
+  const h = idHerr === 'panel' || idHerr === 'equipo' ? null : herramienta(idHerr);
   const cuentas = await almacen.listarCuentas();
   let cuenta = await almacen.cuentaActiva();
 
@@ -214,7 +221,7 @@ export async function montarShell({ herramienta: idHerr, exigeCuenta = true }) {
   while (document.body.firstChild) cuerpo.appendChild(document.body.firstChild);
 
   document.body.innerHTML = `<div class="rbp">${barraLateral(idHerr, cuenta, cuentas, estado, perfilCache)}
-    <div class="rbp-main">${barraSuperior(h)}</div></div>`;
+    <div class="rbp-main">${barraSuperior(h, idHerr)}</div></div>`;
   document.querySelector('.rbp-main').appendChild(cuerpo);
 
   herrActual = idHerr;

@@ -74,18 +74,84 @@ create table if not exists public.csm_invitaciones (
 create index if not exists csm_invitaciones_cuenta_idx
   on public.csm_invitaciones (cuenta_id);
 
+-- ---------- Usuarios permitidos ----------
+-- El alta dejó de ser abierta: solo estas direcciones pueden crear cuenta o
+-- iniciar sesión en Centro CSM. 'supervisor' además puede leer el estado de
+-- las cuentas de 'equipo' (ver csm_estado_equipo() más abajo). Se mantiene a
+-- mano acá — no hay pantalla para editarla, un update por SQL alcanza.
+create table if not exists public.csm_usuarios_permitidos (
+  email  text primary key,
+  rol    text not null default 'equipo' check (rol in ('equipo', 'supervisor'))
+);
+
+insert into public.csm_usuarios_permitidos (email, rol) values
+  ('william.gonzalez@rocketbot.com', 'equipo'),
+  ('juliana.gaviria@rocketbot.com', 'equipo'),
+  ('sara.martinez@rocketbot.com', 'equipo'),
+  ('wladimir.munoz@rocketbot.com', 'equipo'),
+  ('cristobal.loyola@rocketbot.com', 'equipo'),
+  ('rafael.fuentes@rocketbot.com', 'equipo'),
+  ('franco.guinazu@rocketbot.com', 'supervisor'),
+  ('rafael@rocketbot.com', 'supervisor')
+on conflict (email) do update set rol = excluded.rol;
+
+alter table public.csm_usuarios_permitidos enable row level security;
+
+-- Lectura abierta (incluso a `anon`): login.js consulta esta tabla antes de
+-- llamar a signUp/signIn para dar un mensaje claro sin gastar un intento
+-- contra Supabase Auth. No hay nada sensible en email+rol de gente del equipo.
+drop policy if exists csm_usuarios_permitidos_leer on public.csm_usuarios_permitidos;
+create policy csm_usuarios_permitidos_leer on public.csm_usuarios_permitidos
+  for select to anon, authenticated using (true);
+
+-- La barrera real: nadie puede insertar en auth.users (ni por signUp ni por
+-- ninguna otra vía) si el email no está en la whitelist de arriba. Esto es lo
+-- que hace que el chequeo del cliente no sea la única puerta.
+create or replace function public.csm_verificar_email_permitido()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (
+    select 1 from public.csm_usuarios_permitidos where email = lower(new.email)
+  ) then
+    raise exception 'Este email no está autorizado a crear una cuenta en Centro CSM.';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists csm_on_auth_user_created_verificar on auth.users;
+create trigger csm_on_auth_user_created_verificar
+  before insert on auth.users
+  for each row execute function public.csm_verificar_email_permitido();
+
 -- ---------- Perfiles del equipo ----------
--- Una fila por cuenta de Supabase Auth. El registro es de auto-alta: cualquiera
--- que llegue a la pantalla de login puede crear la suya con nombre, email y
--- puesto. No hay aprobación de un admin ni restricción de dominio de correo;
--- si más adelante se necesita, es acá donde se agregaría.
+-- Una fila por cuenta de Supabase Auth. El alta ya no es abierta: solo entra
+-- quien esté en csm_usuarios_permitidos (lo bloquea el trigger de arriba). El
+-- rol se copia de esa misma tabla para no tener que consultarla de nuevo en
+-- cada lectura del perfil.
 create table if not exists public.csm_perfiles (
   id      uuid primary key references auth.users (id) on delete cascade,
   nombre  text not null,
   email   text not null,
   puesto  text default '',
+  rol     text not null default 'equipo' check (rol in ('equipo', 'supervisor')),
   creado  timestamptz not null default now()
 );
+
+alter table public.csm_perfiles add column if not exists rol text not null default 'equipo';
+alter table public.csm_perfiles drop constraint if exists csm_perfiles_rol_check;
+alter table public.csm_perfiles add constraint csm_perfiles_rol_check check (rol in ('equipo', 'supervisor'));
+
+-- Backfill para perfiles que ya existían antes de esta migración (el caso real:
+-- franco.guinazu@rocketbot.com, dado de alta cuando el registro todavía era libre).
+update public.csm_perfiles pf
+set rol = up.rol
+from public.csm_usuarios_permitidos up
+where lower(pf.email) = up.email and pf.rol is distinct from up.rol;
 
 alter table public.csm_perfiles enable row level security;
 
@@ -110,12 +176,13 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.csm_perfiles (id, nombre, email, puesto)
+  insert into public.csm_perfiles (id, nombre, email, puesto, rol)
   values (
     new.id,
     coalesce(nullif(new.raw_user_meta_data->>'nombre', ''), new.email),
     new.email,
-    coalesce(new.raw_user_meta_data->>'puesto', '')
+    coalesce(new.raw_user_meta_data->>'puesto', ''),
+    coalesce((select rol from public.csm_usuarios_permitidos where email = lower(new.email)), 'equipo')
   );
   return new;
 end;
@@ -125,6 +192,55 @@ drop trigger if exists csm_on_auth_user_created on auth.users;
 create trigger csm_on_auth_user_created
   after insert on auth.users
   for each row execute function public.csm_crear_perfil();
+
+-- Estado de las cuentas del equipo, para la pantalla de supervisión
+-- (equipo.html). Solo responde si quien llama tiene rol 'supervisor' — el
+-- chequeo va adentro de la función, no en una política de RLS, porque necesita
+-- leer auth.users (email_confirmed_at, last_sign_in_at) y csm_perfiles no
+-- alcanza para eso.
+create or replace function public.csm_estado_equipo()
+returns table (
+  email             text,
+  nombre            text,
+  puesto            text,
+  cuenta_creada     boolean,
+  email_confirmado  boolean,
+  ultimo_ingreso    timestamptz,
+  creado            timestamptz
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (
+    select 1
+    from public.csm_usuarios_permitidos up
+    join auth.users au on lower(au.email) = up.email
+    where au.id = auth.uid() and up.rol = 'supervisor'
+  ) then
+    raise exception 'No autorizado.';
+  end if;
+
+  return query
+    select
+      up.email,
+      pf.nombre,
+      pf.puesto,
+      (pf.id is not null) as cuenta_creada,
+      (au.email_confirmed_at is not null) as email_confirmado,
+      au.last_sign_in_at as ultimo_ingreso,
+      pf.creado
+    from public.csm_usuarios_permitidos up
+    left join public.csm_perfiles pf on lower(pf.email) = up.email
+    left join auth.users au on lower(au.email) = up.email
+    where up.rol = 'equipo'
+    order by up.email;
+end;
+$$;
+
+revoke all on function public.csm_estado_equipo() from public;
+grant execute on function public.csm_estado_equipo() to authenticated;
 
 -- ==========================================================================
 -- Seguridad

@@ -1,12 +1,12 @@
 /* ==========================================================================
    AUTENTICACIÓN DEL EQUIPO
    --------------------------------------------------------------------------
-   Sesión de equipo interno con Supabase Auth. El alta es de auto-registro:
-   cualquiera que llegue a login.html puede crearse una cuenta con nombre,
-   email, puesto y contraseña — no hay aprobación de un admin ni restricción
-   de dominio de correo. Es la política que se acordó al conectar la base: más
-   simple para que el equipo se sume solo, a cambio de que quien conozca la URL
-   de la plataforma pueda darse de alta.
+   Sesión de equipo interno con Supabase Auth. El alta y el login están
+   restringidos a la whitelist `csm_usuarios_permitidos` de schema.sql — no
+   cualquiera que llegue a login.html puede entrar. El chequeo de acá es solo
+   para dar un mensaje claro sin gastar un intento contra Supabase Auth: la
+   barrera real es el trigger de la base (`csm_verificar_email_permitido`),
+   que corre server-side y no se puede saltear llamando a la API directo.
 
    En modo localStorage no hay nada que autenticar: todas las funciones de acá
    resuelven a "no hay sesión" sin tocar red, y montarShell() no exige login.
@@ -15,6 +15,23 @@
 import { modo, clienteSupabase } from './almacen.js';
 
 export const requiereLogin = modo === 'supabase';
+
+const NO_AUTORIZADO = 'CSM_NO_AUTORIZADO';
+
+/** Rol en la whitelist para ese email, o null si no está autorizado. */
+async function rolPermitido(email) {
+  const sb = await clienteSupabase();
+  const { data, error } = await sb
+    .from('csm_usuarios_permitidos')
+    .select('rol')
+    .eq('email', email)
+    .maybeSingle();
+  if (error) {
+    console.error('[auth] no se pudo verificar la whitelist', error);
+    return null; // ante la duda, no se deja pasar
+  }
+  return data ? data.rol : null;
+}
 
 /** Sesión activa, o null. En modo local, siempre null. */
 export async function sesionActual() {
@@ -45,8 +62,10 @@ export async function perfilActual() {
 }
 
 export async function iniciarSesion(email, password) {
+  const correo = email.trim().toLowerCase();
+  if (!(await rolPermitido(correo))) throw new Error(NO_AUTORIZADO);
   const sb = await clienteSupabase();
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  const { data, error } = await sb.auth.signInWithPassword({ email: correo, password });
   if (error) throw error;
   return data.session;
 }
@@ -68,9 +87,11 @@ export async function iniciarSesion(email, password) {
  * ignora silenciosamente y cae al Site URL en su lugar.
  */
 export async function registrarse({ nombre, email, puesto, password }) {
+  const correo = email.trim().toLowerCase();
+  if (!(await rolPermitido(correo))) throw new Error(NO_AUTORIZADO);
   const sb = await clienteSupabase();
   const { data, error } = await sb.auth.signUp({
-    email,
+    email: correo,
     password,
     options: {
       data: { nombre, puesto: puesto || '' },
@@ -85,4 +106,14 @@ export async function cerrarSesion() {
   if (!requiereLogin) return;
   const sb = await clienteSupabase();
   await sb.auth.signOut();
+}
+
+export const esSupervisor = (perfil) => Boolean(perfil && perfil.rol === 'supervisor');
+
+/** Estado de las cuentas del equipo. Solo responde si el perfil de la sesión es 'supervisor'. */
+export async function estadoEquipo() {
+  const sb = await clienteSupabase();
+  const { data, error } = await sb.rpc('csm_estado_equipo');
+  if (error) throw error;
+  return data || [];
 }
