@@ -12,7 +12,7 @@ import '../styles/login.css';
 
 import { requiereLogin, sesionActual, iniciarSesion, registrarse } from '../lib/auth.js';
 
-const volver = new URLSearchParams(location.search).get('volver') || '/index.html';
+const volver = new URLSearchParams(location.search).get('volver') || '/';
 
 if (!requiereLogin) {
   location.replace(volver);

@@ -65,9 +65,9 @@ function traducirError(desc) {
 }
 
 if (!requiereLogin) {
-  // Sin Supabase no hay nada que confirmar: login.html hace el mismo chequeo
+  // Sin Supabase no hay nada que confirmar: /login hace el mismo chequeo
   // y de ahí cae al panel.
-  location.replace('/login.html');
+  location.replace('/login');
 } else {
   arrancar();
 }
@@ -136,6 +136,6 @@ async function arrancar() {
   }
 
   document.getElementById('cfBtn').addEventListener('click', () => {
-    location.href = '/login.html';
+    location.href = '/login';
   });
 }

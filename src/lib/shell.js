@@ -116,7 +116,7 @@ function barraLateral(idActiva, cuenta, cuentas, estado, perfil) {
         ${opciones}
         <div class="rbp-cuenta-sep"></div>
         <button class="rbp-cuenta-op nueva" id="rbpNuevaCuenta">+ Cuenta nueva</button>
-        <a class="rbp-cuenta-op" href="/index.html">Ver toda la cartera</a>
+        <a class="rbp-cuenta-op" href="/">Ver toda la cartera</a>
       </div>
     </div>
 
@@ -132,12 +132,12 @@ function barraLateral(idActiva, cuenta, cuentas, estado, perfil) {
                 </a>`;
       }).join('')}
       <div class="rbp-nav-tit">Cartera</div>
-      <a class="rbp-nav-i" href="/index.html" ${idActiva === 'panel' ? 'aria-current="page"' : ''}>
+      <a class="rbp-nav-i" href="/" ${idActiva === 'panel' ? 'aria-current="page"' : ''}>
         <span class="rbp-nav-n">◫</span>Panel
       </a>
       ${
         esSupervisor(perfil)
-          ? `<a class="rbp-nav-i" href="/equipo.html" ${idActiva === 'equipo' ? 'aria-current="page"' : ''}>
+          ? `<a class="rbp-nav-i" href="/equipo" ${idActiva === 'equipo' ? 'aria-current="page"' : ''}>
                <span class="rbp-nav-n">☺</span>Equipo
              </a>`
           : ''
@@ -195,7 +195,7 @@ export async function montarShell({ herramienta: idHerr, exigeCuenta = true }) {
   // trabajo (cargar el motor, restaurar datos), y nada de eso debe correr
   // mientras el navegador procesa el redirect.
   if (requiereLogin && !(await sesionActual())) {
-    location.replace('/login.html?volver=' + encodeURIComponent(location.pathname + location.search));
+    location.replace('/login?volver=' + encodeURIComponent(location.pathname + location.search));
     await new Promise(() => {});
   }
   perfilCache = requiereLogin ? await perfilActual() : null;
@@ -370,7 +370,7 @@ function cablearBarra() {
     salir.addEventListener('click', async () => {
       salir.disabled = true;
       await cerrarSesion();
-      location.href = '/login.html';
+      location.href = '/login';
     });
   }
 }

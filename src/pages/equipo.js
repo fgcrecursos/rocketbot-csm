@@ -18,17 +18,6 @@ import { perfilActual, esSupervisor, estadoEquipo } from '../lib/auth.js';
 
 const ctx = await montarShell({ herramienta: 'equipo', exigeCuenta: false });
 
-const perfil = await perfilActual();
-if (!esSupervisor(perfil)) {
-  ctx.cuerpo.innerHTML = `
-    <div class="pn-nada">
-      <h3>No tenés acceso a esta pantalla</h3>
-      <p>Es solo para supervisores.</p>
-    </div>`;
-} else {
-  await cargar();
-}
-
 const esc = (s) =>
   String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -37,9 +26,9 @@ const fechaHora = (iso) =>
     ? new Date(iso).toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : '—';
 
-function estadoCuenta(fila) {
-  if (!fila.cuenta_creada) return { txt: 'Todavía no se registró', c: 'var(--rb-red-txt)' };
-  if (!fila.email_confirmado) return { txt: 'Falta confirmar el email', c: 'var(--rb-amber-txt)' };
+function estadoCuenta(f) {
+  if (!f.cuenta_creada) return { txt: 'Todavía no se registró', c: 'var(--rb-red-txt)' };
+  if (!f.email_confirmado) return { txt: 'Falta confirmar el email', c: 'var(--rb-amber-txt)' };
   return { txt: 'Activa', c: 'var(--rb-green-txt)' };
 }
 
@@ -59,15 +48,25 @@ function fila(f) {
   </tr>`;
 }
 
-async function cargar() {
-  let filas = [];
-  try {
-    filas = await estadoEquipo();
-  } catch (e) {
-    console.error('[equipo]', e);
-    avisar('No se pudo cargar el estado del equipo.', 'error', 4000);
-  }
+/* Cuenta cuántas de las filas todavía no se registraron, para explicar en la
+   propia pantalla por qué la tabla puede verse "vacía" de datos reales incluso
+   cuando la carga funcionó perfecto: nadie del equipo entró todavía. */
+function avisoSinRegistrar(filas) {
+  const sinRegistrar = filas.filter((f) => !f.cuenta_creada).length;
+  if (sinRegistrar === 0) return '';
+  const todos = sinRegistrar === filas.length;
+  return `
+  <div class="pn-nota" style="margin-bottom:16px">
+    ${
+      todos
+        ? 'Ninguna de las 6 personas del equipo creó su cuenta todavía — por eso no hay más datos que el email para mostrar.'
+        : `${sinRegistrar} de ${filas.length} personas del equipo todavía no crearon su cuenta.`
+    }
+    Van a aparecer acá apenas se registren desde <a href="/login">/login</a>.
+  </div>`;
+}
 
+function render(filas) {
   ctx.cuerpo.innerHTML = `
   <div class="pn">
     <div class="pn-hero">
@@ -77,6 +76,8 @@ async function cargar() {
         <p>Estado de las cuentas de acceso a Centro CSM.</p>
       </div>
     </div>
+
+    ${filas.length ? avisoSinRegistrar(filas) : ''}
 
     <h2 class="pn-sec">Cuentas</h2>
     <div class="pn-tabla-caja">
@@ -89,8 +90,30 @@ async function cargar() {
         </tr></thead>
         <tbody>${filas.map(fila).join('')}</tbody>
       </table></div>`
-          : `<div class="pn-nada"><h3>Sin datos</h3><p>No se pudo leer el estado del equipo.</p></div>`
+          : `<div class="pn-nada"><h3>Sin datos</h3><p>No se pudo leer el estado del equipo. Revisá la consola.</p></div>`
       }
     </div>
   </div>`;
+}
+
+async function cargar() {
+  let filas = [];
+  try {
+    filas = await estadoEquipo();
+  } catch (e) {
+    console.error('[equipo]', e);
+    avisar('No se pudo cargar el estado del equipo.', 'error', 4000);
+  }
+  render(filas);
+}
+
+const perfil = await perfilActual();
+if (!esSupervisor(perfil)) {
+  ctx.cuerpo.innerHTML = `
+    <div class="pn-nada">
+      <h3>No tenés acceso a esta pantalla</h3>
+      <p>Es solo para supervisores.</p>
+    </div>`;
+} else {
+  await cargar();
 }

@@ -344,7 +344,7 @@ async function dialogoLink(cuentaId) {
     const herr = document.getElementById('fHerr').value;
     const dias = Number(document.getElementById('fDias').value);
     const inv = await almacen.crearInvitacion(cuentaId, herr, dias);
-    const url = `${location.origin}/publico.html?t=${inv.token}`;
+    const url = `${location.origin}/publico?t=${inv.token}`;
 
     document.getElementById('fResultado').innerHTML = `
       <div class="pn-link">
