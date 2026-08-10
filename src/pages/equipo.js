@@ -1,12 +1,18 @@
 /* ==========================================================================
    ESTADO DEL EQUIPO
    --------------------------------------------------------------------------
-   Pantalla solo para supervisores: lista los emails de csm_usuarios_permitidos
-   con rol 'equipo' y muestra si ya crearon la cuenta, si confirmaron el email
-   y cuándo entraron por última vez. Los datos salen de csm_estado_equipo(),
-   que en la base rechaza a cualquiera que no sea supervisor — este chequeo de
-   acá es solo para no mostrar la pantalla vacía a quien de todas formas no
-   puede pedir los datos.
+   Pantalla solo para supervisores. Combina dos fuentes:
+   - csm_estado_equipo(): actividad de acceso (¿se registró?, ¿confirmó el
+     email?, último ingreso). La base rechaza a cualquiera que no sea
+     supervisor — el chequeo de acá es solo para no mostrar la pantalla vacía
+     a quien de todas formas no puede pedir los datos.
+   - almacen.listarCuentas(): el trabajo real de CS. No hay ninguna relación
+     en la base entre una cuenta de cliente y quién la cargó — lo único que
+     existe es el campo de texto libre "Responsable de la cuenta" (csm) del
+     Panel. El cruce de acá compara ese texto contra el nombre del perfil
+     (sin mayúsculas ni espacios de sobra); si alguien lo llenó distinto a
+     como se registró, esa cuenta no va a aparecer bajo su nombre. Es una
+     limitación del dato, no de esta pantalla.
    ========================================================================== */
 
 import '../styles/tokens.css';
@@ -15,11 +21,15 @@ import '../styles/panel.css';
 
 import { montarShell, avisar } from '../lib/shell.js';
 import { perfilActual, esSupervisor, estadoEquipo } from '../lib/auth.js';
+import { almacen } from '../lib/almacen.js';
+import { HERRAMIENTAS, bandaDe } from '../lib/modelo.js';
 
 const ctx = await montarShell({ herramienta: 'equipo', exigeCuenta: false });
 
 const esc = (s) =>
   String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = (n) => new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(Math.round(n || 0));
+const normalizar = (s) => String(s || '').trim().toLowerCase();
 
 const fechaHora = (iso) =>
   iso
@@ -32,8 +42,64 @@ function estadoCuenta(f) {
   return { txt: 'Activa', c: 'var(--rb-green-txt)' };
 }
 
-function fila(f) {
+/* ---------- Cuentas de cliente que cargó cada persona ---------- */
+
+function celdaScore(e) {
+  const h = e.health?.resultado;
+  return h && typeof h.score === 'number'
+    ? `<span class="pn-score" style="--b:${bandaDe(h.score).c}">${h.score}<small>${esc(h.banda)}</small></span>`
+    : '<span class="pn-vacio">—</span>';
+}
+function celdaMadurez(e) {
+  const m = e.madurez?.resultado;
+  return m ? `<span class="pn-nivel">N${m.nivel} · ${esc(m.nivelNombre)}</span>` : '<span class="pn-vacio">—</span>';
+}
+function celdaAhorro(e) {
+  const o = e.oportunidades?.resultado;
+  return o && o.ahorroMaxMes ? `${fmt(o.ahorroMinMes)}–${fmt(o.ahorroMaxMes)} h` : '<span class="pn-vacio">—</span>';
+}
+function celdaRoadmap(e) {
+  const r = e.roadmap?.resultado;
+  return r && r.procesos ? `${r.procesos} proc.` : '<span class="pn-vacio">—</span>';
+}
+
+function filaCuenta(c, e) {
+  const botones = HERRAMIENTAS.map(
+    (h) => `<a class="pn-h ${e[h.id] ? 'lleno' : ''}" data-c="${h.n}" data-abrir="${c.id}" data-pagina="${h.pagina}"
+               href="${h.pagina}" title="${esc(h.nombre)}${e[h.id] ? ' · con datos' : ''}">0${h.n}</a>`
+  ).join('');
+  return `
+  <tr>
+    <td>${esc(c.nombre || 'Sin nombre')}</td>
+    <td>${celdaScore(e)}</td>
+    <td>${celdaMadurez(e)}</td>
+    <td class="num">${celdaAhorro(e)}</td>
+    <td class="num">${celdaRoadmap(e)}</td>
+    <td><div class="pn-acc">${botones}</div></td>
+  </tr>`;
+}
+
+function detalleCuentas(f, cuentas, estados) {
+  const propias = cuentas.filter((c) => normalizar(c.csm) === normalizar(f.nombre));
+  const cuerpo = propias.length
+    ? `<div class="pn-scroll"><table class="pn-tabla">
+        <thead><tr>
+          <th>Cuenta</th><th>Health Score</th><th>Madurez IA</th>
+          <th class="num">Ahorro / mes</th><th class="num">Roadmap</th>
+          <th style="text-align:right">Herramientas</th>
+        </tr></thead>
+        <tbody>${propias.map((c) => filaCuenta(c, estados.get(c.id) || {})).join('')}</tbody>
+      </table></div>`
+    : `<p style="font-size:12.5px;color:var(--ink-3);margin:0">
+         Ninguna cuenta del Panel tiene "${esc(f.nombre)}" en su campo "Responsable" todavía.</p>`;
+  return `<tr class="rbp-detalle" data-detalle="${esc(f.email)}" style="display:none">
+    <td colspan="5" style="background:var(--surface-2);padding:14px 16px">${cuerpo}</td>
+  </tr>`;
+}
+
+function fila(f, cuentas, estados) {
   const e = estadoCuenta(f);
+  const propias = cuentas.filter((c) => normalizar(c.csm) === normalizar(f.nombre)).length;
   return `
   <tr>
     <td>
@@ -44,8 +110,13 @@ function fila(f) {
     </td>
     <td><span style="color:${e.c};font-weight:600">${esc(e.txt)}</span></td>
     <td class="num" style="color:var(--ink-3);font-size:12.5px">${fechaHora(f.ultimo_ingreso)}</td>
-    <td class="num" style="color:var(--ink-3);font-size:12.5px">${fechaHora(f.creado)}</td>
-  </tr>`;
+    <td>
+      <button class="rbp-btn" data-ver="${esc(f.email)}" ${propias === 0 ? 'disabled' : ''}>
+        Ver cuentas${propias ? ` (${propias})` : ''}
+      </button>
+    </td>
+  </tr>
+  ${detalleCuentas(f, cuentas, estados)}`;
 }
 
 /* Cuenta cuántas de las filas todavía no se registraron, para explicar en la
@@ -66,14 +137,14 @@ function avisoSinRegistrar(filas) {
   </div>`;
 }
 
-function render(filas) {
+function render(filas, cuentas, estados) {
   ctx.cuerpo.innerHTML = `
   <div class="pn">
     <div class="pn-hero">
       <div>
         <span class="eyebrow">Customer Success</span>
         <h1>Equipo</h1>
-        <p>Estado de las cuentas de acceso a Centro CSM.</p>
+        <p>Estado de las cuentas de acceso a Centro CSM y, por persona, las cuentas de cliente que tiene a cargo.</p>
       </div>
     </div>
 
@@ -86,25 +157,49 @@ function render(filas) {
           ? `<div class="pn-scroll"><table class="pn-tabla">
         <thead><tr>
           <th>Persona</th><th>Estado</th>
-          <th class="num">Último ingreso</th><th class="num">Cuenta creada</th>
+          <th class="num">Último ingreso</th><th>Cuentas de cliente</th>
         </tr></thead>
-        <tbody>${filas.map(fila).join('')}</tbody>
+        <tbody>${filas.map((f) => fila(f, cuentas, estados)).join('')}</tbody>
       </table></div>`
           : `<div class="pn-nada"><h3>Sin datos</h3><p>No se pudo leer el estado del equipo. Revisá la consola.</p></div>`
       }
     </div>
   </div>`;
+
+  cablear();
+}
+
+function cablear() {
+  ctx.cuerpo.querySelectorAll('[data-ver]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const fila = ctx.cuerpo.querySelector(`[data-detalle="${CSS.escape(btn.dataset.ver)}"]`);
+      if (!fila) return;
+      const abierta = fila.style.display !== 'none';
+      fila.style.display = abierta ? 'none' : '';
+      btn.setAttribute('aria-expanded', String(!abierta));
+    });
+  });
+  ctx.cuerpo.querySelectorAll('[data-abrir]').forEach((a) =>
+    a.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      almacen.fijarCuentaActiva(a.dataset.abrir);
+      location.href = a.dataset.pagina;
+    })
+  );
 }
 
 async function cargar() {
   let filas = [];
+  let cuentas = [];
+  let estados = new Map();
   try {
-    filas = await estadoEquipo();
+    [filas, cuentas] = await Promise.all([estadoEquipo(), almacen.listarCuentas()]);
+    for (const c of cuentas) estados.set(c.id, await almacen.estadoDeCuenta(c.id));
   } catch (e) {
     console.error('[equipo]', e);
     avisar('No se pudo cargar el estado del equipo.', 'error', 4000);
   }
-  render(filas);
+  render(filas, cuentas, estados);
 }
 
 const perfil = await perfilActual();

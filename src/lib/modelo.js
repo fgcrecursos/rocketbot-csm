@@ -56,6 +56,19 @@ export const HERRAMIENTAS = [
 
 export const herramienta = (id) => HERRAMIENTAS.find((h) => h.id === id);
 
+/* Las mismas bandas que usa el Health Score, para que un 72 signifique lo
+   mismo en cualquier lista que se arme fuera de la herramienta (Panel,
+   Equipo). Se usan las variantes -txt de cada color: la banda se pinta como
+   texto sobre un fondo tenue del mismo tono, y los accents de marca en su
+   valor base no llegan al contraste mínimo en ese uso. */
+export const BANDAS = [
+  { min: 85, n: 'Saludable', c: 'var(--rb-green-txt)' },
+  { min: 70, n: 'Estable', c: 'var(--rb-blue-txt)' },
+  { min: 50, n: 'Observación', c: 'var(--rb-amber-txt)' },
+  { min: 0, n: 'En riesgo', c: 'var(--rb-red-txt)' },
+];
+export const bandaDe = (s) => BANDAS.find((b) => s >= b.min) || BANDAS[BANDAS.length - 1];
+
 /* --------------------------------------------------------------------------
    Catálogos canónicos
    -------------------------------------------------------------------------- */

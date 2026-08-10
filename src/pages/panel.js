@@ -13,26 +13,13 @@ import '../styles/panel.css';
 
 import { montarShell, avisar, refrescarBarra } from '../lib/shell.js';
 import { almacen } from '../lib/almacen.js';
-import { HERRAMIENTAS, INDUSTRIAS, PAISES, iniciales, cuentaVacia } from '../lib/modelo.js';
+import { HERRAMIENTAS, INDUSTRIAS, PAISES, iniciales, cuentaVacia, bandaDe } from '../lib/modelo.js';
 
 const ctx = await montarShell({ herramienta: 'panel', exigeCuenta: false });
 
 const esc = (s) =>
   String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (n) => new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(Math.round(n || 0));
-
-/* Las mismas bandas que usa el Health Score, para que un 72 signifique lo
-   mismo en el panel que dentro de la herramienta.
-   Se usan las variantes -txt de cada color: acá la banda se pinta como texto
-   sobre un fondo tenue del mismo tono, y los accents de marca en su valor
-   base no llegan al contraste mínimo en ese uso. */
-const BANDAS = [
-  { min: 85, n: 'Saludable', c: 'var(--rb-green-txt)' },
-  { min: 70, n: 'Estable', c: 'var(--rb-blue-txt)' },
-  { min: 50, n: 'Observación', c: 'var(--rb-amber-txt)' },
-  { min: 0, n: 'En riesgo', c: 'var(--rb-red-txt)' },
-];
-const bandaDe = (s) => BANDAS.find((b) => s >= b.min) || BANDAS[BANDAS.length - 1];
 
 const ICONO = {
   link: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7"/></svg>',
