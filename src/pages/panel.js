@@ -31,7 +31,7 @@ let cuentas = [];
 let estados = new Map();
 
 async function cargar() {
-  cuentas = await almacen.listarCuentas();
+  cuentas = await almacen.misCuentas();
   estados = new Map();
   for (const c of cuentas) estados.set(c.id, await almacen.estadoDeCuenta(c.id));
 }

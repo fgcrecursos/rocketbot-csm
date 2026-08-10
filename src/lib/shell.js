@@ -202,7 +202,7 @@ export async function montarShell({ herramienta: idHerr, exigeCuenta = true }) {
   temaInicial();
 
   const h = idHerr === 'panel' || idHerr === 'equipo' ? null : herramienta(idHerr);
-  const cuentas = await almacen.listarCuentas();
+  const cuentas = await almacen.misCuentas();
   let cuenta = await almacen.cuentaActiva();
 
   // Si no hay cuenta activa pero sí cuentas, se toma la última tocada. Obligar
@@ -315,7 +315,7 @@ export async function refrescarBarra() {
   const vieja = document.querySelector('.rbp-side');
   if (!vieja) return;
 
-  const cuentas = await almacen.listarCuentas();
+  const cuentas = await almacen.misCuentas();
   const cuenta = await almacen.cuentaActiva();
   const estado = cuenta ? await almacen.estadoDeCuenta(cuenta.id) : null;
 

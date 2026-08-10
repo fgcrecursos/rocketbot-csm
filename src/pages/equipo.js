@@ -3,16 +3,16 @@
    --------------------------------------------------------------------------
    Pantalla solo para supervisores. Combina dos fuentes:
    - csm_estado_equipo(): actividad de acceso (¿se registró?, ¿confirmó el
-     email?, último ingreso). La base rechaza a cualquiera que no sea
-     supervisor — el chequeo de acá es solo para no mostrar la pantalla vacía
-     a quien de todas formas no puede pedir los datos.
-   - almacen.listarCuentas(): el trabajo real de CS. No hay ninguna relación
-     en la base entre una cuenta de cliente y quién la cargó — lo único que
-     existe es el campo de texto libre "Responsable de la cuenta" (csm) del
-     Panel. El cruce de acá compara ese texto contra el nombre del perfil
-     (sin mayúsculas ni espacios de sobra); si alguien lo llenó distinto a
-     como se registró, esa cuenta no va a aparecer bajo su nombre. Es una
-     limitación del dato, no de esta pantalla.
+     email?, último ingreso) más el id de auth.users de cada persona. La base
+     rechaza a cualquiera que no sea supervisor — el chequeo de acá es solo
+     para no mostrar la pantalla vacía a quien de todas formas no puede pedir
+     los datos.
+   - almacen.listarCuentas(): el trabajo real de CS. Cada cuenta tiene un
+     owner (uuid de auth.users) desde que la cartera dejó de ser compartida;
+     acá se cruzan por ese id, no por texto. Un supervisor ve todas las
+     cuentas de todo el mundo por RLS (política csm_cuentas_supervisor_ver en
+     schema.sql) — el resto del equipo, con almacen.misCuentas(), solo ve las
+     propias.
    ========================================================================== */
 
 import '../styles/tokens.css';
@@ -29,7 +29,6 @@ const ctx = await montarShell({ herramienta: 'equipo', exigeCuenta: false });
 const esc = (s) =>
   String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (n) => new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(Math.round(n || 0));
-const normalizar = (s) => String(s || '').trim().toLowerCase();
 
 const fechaHora = (iso) =>
   iso
@@ -80,7 +79,7 @@ function filaCuenta(c, e) {
 }
 
 function detalleCuentas(f, cuentas, estados) {
-  const propias = cuentas.filter((c) => normalizar(c.csm) === normalizar(f.nombre));
+  const propias = cuentas.filter((c) => c.owner === f.id);
   const cuerpo = propias.length
     ? `<div class="pn-scroll"><table class="pn-tabla">
         <thead><tr>
@@ -90,16 +89,15 @@ function detalleCuentas(f, cuentas, estados) {
         </tr></thead>
         <tbody>${propias.map((c) => filaCuenta(c, estados.get(c.id) || {})).join('')}</tbody>
       </table></div>`
-    : `<p style="font-size:12.5px;color:var(--ink-3);margin:0">
-         Ninguna cuenta del Panel tiene "${esc(f.nombre)}" en su campo "Responsable" todavía.</p>`;
+    : `<p style="font-size:12.5px;color:var(--ink-3);margin:0">Todavía no cargó ninguna cuenta.</p>`;
   return `<tr class="rbp-detalle" data-detalle="${esc(f.email)}" style="display:none">
-    <td colspan="5" style="background:var(--surface-2);padding:14px 16px">${cuerpo}</td>
+    <td colspan="4" style="background:var(--surface-2);padding:14px 16px">${cuerpo}</td>
   </tr>`;
 }
 
 function fila(f, cuentas, estados) {
   const e = estadoCuenta(f);
-  const propias = cuentas.filter((c) => normalizar(c.csm) === normalizar(f.nombre)).length;
+  const propias = cuentas.filter((c) => c.owner === f.id).length;
   return `
   <tr>
     <td>

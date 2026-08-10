@@ -31,9 +31,18 @@ create table if not exists public.csm_cuentas (
   cliente_desde       text default '',
   renovacion          text default '',
   notas               text default '',
+  owner               uuid references auth.users (id) on delete set null,
   creado              timestamptz not null default now(),
   actualizado         timestamptz not null default now()
 );
+
+-- Cada cuenta es de quien la creó; ver la sección "Seguridad" más abajo para
+-- la política que lo hace cumplir. Las que ya existían de antes de esta
+-- columna quedan con owner null a propósito — no se sabe quién las creó, y la
+-- política de supervisor las deja visibles solo para supervisores hasta que
+-- alguien las reasigne a mano (update csm_cuentas set owner='<uuid>' where
+-- id='<id>'; el uuid es el id de auth.users, no el email).
+alter table public.csm_cuentas add column if not exists owner uuid references auth.users (id) on delete set null;
 
 create index if not exists csm_cuentas_actualizado_idx
   on public.csm_cuentas (actualizado desc);
@@ -202,6 +211,7 @@ create trigger csm_on_auth_user_created
 -- alcanza para eso.
 create or replace function public.csm_estado_equipo()
 returns table (
+  id                uuid,
   email             text,
   nombre            text,
   puesto            text,
@@ -226,6 +236,7 @@ begin
 
   return query
     select
+      au.id,
       up.email,
       pf.nombre,
       pf.puesto,
@@ -247,8 +258,12 @@ grant execute on function public.csm_estado_equipo() to authenticated;
 -- ==========================================================================
 -- Seguridad
 -- --------------------------------------------------------------------------
--- Dos públicos distintos sobre las mismas tablas:
---   · el equipo de Rocketbot, autenticado, ve y edita todo;
+-- Tres públicos distintos sobre las mismas tablas:
+--   · cada persona del equipo ve y edita únicamente las cuentas que creó —
+--     la cartera no es compartida, cada cuenta es de quien la dio de alta;
+--   · un supervisor además puede LEER las cuentas de cualquiera (para
+--     equipo.html), pero no editar las que no son suyas — no hay política de
+--     insert/update/delete para supervisor, solo select;
 --   · el cliente invitado llega con un token en la URL y no está autenticado.
 --
 -- Al cliente no se le puede dar `select` sobre csm_cuentas ni sobre las
@@ -261,18 +276,61 @@ alter table public.csm_cuentas      enable row level security;
 alter table public.csm_evaluaciones enable row level security;
 alter table public.csm_invitaciones enable row level security;
 
--- Equipo Rocketbot: acceso completo con sesión iniciada.
+-- Reutilizada por las políticas de las tres tablas de abajo.
+create or replace function public.csm_es_supervisor(p_uid uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.csm_usuarios_permitidos up
+    join auth.users au on au.id = p_uid
+    where lower(au.email) = up.email and up.rol = 'supervisor'
+  );
+$$;
+
+-- Dueño: acceso completo a lo suyo.
 drop policy if exists csm_cuentas_equipo on public.csm_cuentas;
-create policy csm_cuentas_equipo on public.csm_cuentas
-  for all to authenticated using (true) with check (true);
+drop policy if exists csm_cuentas_propias on public.csm_cuentas;
+create policy csm_cuentas_propias on public.csm_cuentas
+  for all to authenticated
+  using (owner = auth.uid())
+  with check (owner = auth.uid());
+
+-- Supervisor: solo lectura de lo ajeno (política adicional — en RLS varias
+-- políticas permisivas para el mismo comando se combinan con OR, así que esto
+-- no le resta acceso a la de arriba).
+drop policy if exists csm_cuentas_supervisor_ver on public.csm_cuentas;
+create policy csm_cuentas_supervisor_ver on public.csm_cuentas
+  for select to authenticated
+  using (public.csm_es_supervisor(auth.uid()));
 
 drop policy if exists csm_evaluaciones_equipo on public.csm_evaluaciones;
-create policy csm_evaluaciones_equipo on public.csm_evaluaciones
-  for all to authenticated using (true) with check (true);
+drop policy if exists csm_evaluaciones_propias on public.csm_evaluaciones;
+create policy csm_evaluaciones_propias on public.csm_evaluaciones
+  for all to authenticated
+  using (exists (select 1 from public.csm_cuentas c where c.id = cuenta_id and c.owner = auth.uid()))
+  with check (exists (select 1 from public.csm_cuentas c where c.id = cuenta_id and c.owner = auth.uid()));
+
+drop policy if exists csm_evaluaciones_supervisor_ver on public.csm_evaluaciones;
+create policy csm_evaluaciones_supervisor_ver on public.csm_evaluaciones
+  for select to authenticated
+  using (public.csm_es_supervisor(auth.uid()));
 
 drop policy if exists csm_invitaciones_equipo on public.csm_invitaciones;
-create policy csm_invitaciones_equipo on public.csm_invitaciones
-  for all to authenticated using (true) with check (true);
+drop policy if exists csm_invitaciones_propias on public.csm_invitaciones;
+create policy csm_invitaciones_propias on public.csm_invitaciones
+  for all to authenticated
+  using (exists (select 1 from public.csm_cuentas c where c.id = cuenta_id and c.owner = auth.uid()))
+  with check (exists (select 1 from public.csm_cuentas c where c.id = cuenta_id and c.owner = auth.uid()));
+
+drop policy if exists csm_invitaciones_supervisor_ver on public.csm_invitaciones;
+create policy csm_invitaciones_supervisor_ver on public.csm_invitaciones
+  for select to authenticated
+  using (public.csm_es_supervisor(auth.uid()));
 
 -- Sin políticas para `anon`: el rol anónimo no toca las tablas directamente.
 

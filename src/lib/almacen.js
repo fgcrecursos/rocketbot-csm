@@ -157,6 +157,17 @@ const respaldoSupabase = {
     return this._cli;
   },
 
+  /* auth.js importa de este archivo (no al revés), así que para no crear una
+     dependencia circular el id de la sesión se pide acá directo con el mismo
+     cliente, en vez de reusar algo de auth.js. */
+  async usuarioActualId() {
+    const sb = await this.cliente();
+    const {
+      data: { session },
+    } = await sb.auth.getSession();
+    return session?.user?.id || null;
+  },
+
   async listarCuentas() {
     const sb = await this.cliente();
     const { data, error } = await sb.from('csm_cuentas').select('*').order('actualizado', { ascending: false });
@@ -295,14 +306,32 @@ export const clienteSupabase = () => (modo === 'supabase' ? respaldoSupabase.cli
 export const almacen = {
   modo: respaldo.nombre,
 
-  /* ---- Cuentas ---- */
+  /** Id de auth.users de la sesión activa, o null (modo local, o sin sesión). */
+  usuarioActualId: () => (modo === 'supabase' ? respaldoSupabase.usuarioActualId() : Promise.resolve(null)),
+
+  /* ---- Cuentas ----
+     listarCuentas() devuelve lo que RLS deje pasar tal cual: para un
+     supervisor eso incluye las cuentas de todo el mundo, no solo las suyas —
+     es lo que necesita equipo.js para armar el detalle por persona. misCuentas()
+     filtra del lado del cliente a "las que creé yo", que es lo que tienen que
+     ver la barra lateral y el Panel para cualquiera, supervisor incluido: ver
+     todo junto ahí sería confuso, y esa vista global ya existe en /equipo. */
   listarCuentas: () => respaldo.listarCuentas(),
+  async misCuentas() {
+    const todas = await respaldo.listarCuentas();
+    if (modo !== 'supabase') return todas;
+    const miId = await this.usuarioActualId();
+    return miId ? todas.filter((c) => c.owner === miId) : todas;
+  },
   obtenerCuenta: (id) => respaldo.obtenerCuenta(id),
   guardarCuenta: (c) => respaldo.guardarCuenta(c),
   borrarCuenta: (id) => respaldo.borrarCuenta(id),
 
   async crearCuenta(nombre) {
-    return respaldo.guardarCuenta(cuentaVacia(nombre));
+    const c = cuentaVacia(nombre);
+    const owner = await this.usuarioActualId();
+    if (owner) c.owner = owner;
+    return respaldo.guardarCuenta(c);
   },
 
   /* ---- Cuenta activa ---- */
