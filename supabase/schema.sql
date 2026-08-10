@@ -90,9 +90,11 @@ insert into public.csm_usuarios_permitidos (email, rol) values
   ('sara.martinez@rocketbot.com', 'equipo'),
   ('wladimir.munoz@rocketbot.com', 'equipo'),
   ('cristobal.loyola@rocketbot.com', 'equipo'),
-  ('rafael.fuentes@rocketbot.com', 'equipo'),
   ('franco.guinazu@rocketbot.com', 'supervisor'),
-  ('rafael@rocketbot.com', 'supervisor')
+  ('rafael@rocketbot.com', 'supervisor'),
+  ('rafael.fuentes@rocketbot.com', 'supervisor'),
+  ('leonardo.garcia@rocketbot.com', 'supervisor'),
+  ('paula.restrepo@rocketbot.com', 'supervisor')
 on conflict (email) do update set rol = excluded.rol;
 
 alter table public.csm_usuarios_permitidos enable row level security;

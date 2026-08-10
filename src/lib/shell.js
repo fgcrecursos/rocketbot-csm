@@ -155,7 +155,6 @@ function barraLateral(idActiva, cuenta, cuentas, estado, perfil) {
       }
       <button class="rbp-side-btn" id="rbpTema"><span data-rbp-tema-txt>Modo oscuro</span></button>
       ${requiereLogin ? '<button class="rbp-side-btn" id="rbpSalir">Cerrar sesión</button>' : ''}
-      <div class="rbp-side-modo">Datos: ${almacen.modo}</div>
     </div>
   </aside>`;
 }

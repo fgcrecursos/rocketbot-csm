@@ -43,7 +43,7 @@
   text-overflow: ellipsis;
 }
 .pu-top-txt .s {
-  font-family: var(--mono);
+  font-family: var(--display);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;

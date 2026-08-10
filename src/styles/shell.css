@@ -101,6 +101,15 @@ button {
   width: auto;
   flex: 0 0 auto;
 }
+.rbp-brand .txt {
+  min-width: 0;
+}
+.rbp-brand .t,
+.rbp-brand .s {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .rbp-brand .t {
   font-family: var(--display);
   font-weight: 700;
@@ -109,7 +118,7 @@ button {
   line-height: 1.25;
 }
 .rbp-brand .s {
-  font-family: var(--mono);
+  font-family: var(--display);
   font-size: 9px;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -165,7 +174,7 @@ button {
   text-overflow: ellipsis;
 }
 .rbp-cuenta-txt .m {
-  font-family: var(--mono);
+  font-family: var(--display);
   font-size: 9.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -223,7 +232,7 @@ button {
 }
 .rbp-cuenta-op .sub {
   display: block;
-  font-family: var(--mono);
+  font-family: var(--display);
   font-size: 10px;
   color: var(--ink-3);
   margin-top: 1px;
@@ -253,7 +262,7 @@ button {
   overflow-y: auto;
 }
 .rbp-nav-tit {
-  font-family: var(--mono);
+  font-family: var(--display);
   font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -356,15 +365,6 @@ button {
   background: var(--side-hover);
   color: #fff;
 }
-.rbp-side-modo {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.45;
-  text-align: center;
-}
-
 .rbp-perfil {
   padding: 2px 2px 4px;
   text-align: center;
@@ -415,7 +415,7 @@ button {
 }
 .rbp-top-tit small {
   display: block;
-  font-family: var(--mono);
+  font-family: var(--display);
   font-weight: 400;
   font-size: 9.5px;
   color: var(--ink-3);
