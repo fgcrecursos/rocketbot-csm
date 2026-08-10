@@ -209,6 +209,11 @@ create trigger csm_on_auth_user_created
 -- chequeo va adentro de la función, no en una política de RLS, porque necesita
 -- leer auth.users (email_confirmed_at, last_sign_in_at) y csm_perfiles no
 -- alcanza para eso.
+--
+-- El drop de acá es necesario (no alcanza con create or replace): Postgres no
+-- deja cambiar el tipo de retorno de una función RETURNS TABLE con un simple
+-- replace, y esta versión le agrega la columna `id`.
+drop function if exists public.csm_estado_equipo();
 create or replace function public.csm_estado_equipo()
 returns table (
   id                uuid,
