@@ -7,7 +7,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  font-family:'Mulish',system-ui,-apple-system,sans-serif;
+  font-family:var(--body);
   background:var(--bg);
   color:var(--ink);
   line-height:1.6;
@@ -86,7 +86,7 @@ main{padding:40px 0 96px}
 select,input[type=text],input[type=email],input[type=number]{
   width:100%;padding:11px 13px;
   border:1px solid var(--line);border-radius:var(--r-md);
-  font-family:'Mulish';font-size:14.5px;color:var(--ink);
+  font-family:var(--body);font-size:14.5px;color:var(--ink);
   background:var(--surface);
   transition:border-color .15s,box-shadow .15s;
 }
@@ -117,7 +117,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .proc-name .d{font-size:12.5px;color:var(--ink-3);margin-top:3px;line-height:1.45}
 .seg{display:flex;gap:0;flex:0 0 auto;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
 .seg button{
-  font-family:'Mulish';font-size:12px;font-weight:700;
+  font-family:var(--body);font-size:12px;font-weight:700;
   padding:7px 12px;border:0;background:var(--surface);color:var(--ink-3);
   cursor:pointer;white-space:nowrap;transition:background .15s,color .15s;
 }
@@ -145,8 +145,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   display:inline-flex;align-items:center;gap:9px;
 }
 .btn:active{transform:translateY(1px)}
-.btn-primary{background:var(--rb-red);color:#fff;box-shadow:0 6px 18px -8px rgba(188,0,23,.7)}
-.btn-primary:hover{background:#A30014}
+.btn-primary{background:var(--action);color:#fff;box-shadow:0 6px 18px -8px rgba(29,158,117,.7)}
+.btn-primary:hover{background:var(--action-deep)}
 .btn-ghost{background:var(--surface);color:var(--ink-2);border-color:var(--line)}
 .btn-ghost:hover{background:var(--line-soft)}
 .btn-dark{background:var(--rb-dark);color:#fff}

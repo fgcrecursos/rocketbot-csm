@@ -545,7 +545,7 @@ function matriz(evs, w){
     ${quads.map(q=>`<rect x="${q.x}" y="${q.y}" width="${q.w}" height="${q.h}" fill="${q.c}" opacity="0.055"/>`).join('')}
     ${quads.map(q=>`
       <text x="${q.x+q.w/2}" y="${q.y+18}" text-anchor="middle" font-family="Montserrat" font-size="11.5" font-weight="700" fill="${q.c}" opacity=".85">${q.t}</text>
-      <text x="${q.x+q.w/2}" y="${q.y+32}" text-anchor="middle" font-family="Mulish" font-size="9.5" fill="${q.c}" opacity=".6">${q.st}</text>`).join('')}
+      <text x="${q.x+q.w/2}" y="${q.y+32}" text-anchor="middle" font-family="Montserrat" font-size="9.5" fill="${q.c}" opacity=".6">${q.st}</text>`).join('')}
     <line x1="${cx}" y1="${m.t}" x2="${cx}" y2="${m.t+ph}" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="4 4"/>
     <line x1="${m.l}" y1="${cy}" x2="${m.l+pw}" y2="${cy}" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="4 4"/>
     <rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="none" stroke="var(--line)" stroke-width="1.5"/>

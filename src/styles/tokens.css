@@ -43,6 +43,23 @@
   --rb-amber: #ba7517;
   --rb-purple: #6e4b9e;
 
+  /* ---- Acción principal (botones) ----
+     El rojo es el accent de marca — el mismo que usa rocketbot.com en sus
+     CTA — y se mantiene como accent decorativo (barras, insignias, iniciales
+     de cuenta). Pero repetido en cada botón "Guardar"/"Entrar"/"Crear cuenta"
+     de una herramienta de uso diario, se lee como alarma. Los botones de
+     acción principal usan este token en su lugar; el rojo queda reservado
+     para lo destructivo (borrar cuenta, cerrar sesión) y los estados de
+     error, que ya lo usaban antes de este cambio.
+
+     Se apoya en --chip-green (no en --rb-green) a propósito: --rb-green se
+     aclara en tema oscuro para poder usarse como texto, y con blanco encima
+     de un botón eso da ~2:1 de contraste —prácticamente ilegible—, el mismo
+     problema que ya resolvieron los chips. --chip-green no cambia con el
+     tema y da 8:1 en los dos. */
+  --action: var(--chip-green);
+  --action-deep: color-mix(in srgb, var(--action) 82%, black);
+
   /* ---- Superficies ---- */
   --bg: #f5f7f8;
   --bg-2: #e8eef0;
@@ -75,9 +92,13 @@
   --shadow-lg: 0 4px 10px rgba(38, 50, 56, 0.08), 0 26px 50px -24px rgba(38, 50, 56, 0.3);
   --ease: cubic-bezier(0.2, 0.7, 0.25, 1);
 
-  /* ---- Tipografía ---- */
+  /* ---- Tipografía ----
+     Una sola familia en toda la herramienta, como en rocketbot.com: Montserrat
+     también en el texto de párrafo, no solo en títulos y botones. --body queda
+     como alias de --display en vez de borrarlo, para no tener que tocar cada
+     regla que ya lo usa. */
   --display: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --body: 'Mulish', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --body: var(--display);
   --mono: 'JetBrains Mono', ui-monospace, Menlo, 'Courier New', monospace;
 
   /* ---- Rellenos que llevan texto blanco encima ----

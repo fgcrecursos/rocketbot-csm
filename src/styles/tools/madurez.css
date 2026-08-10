@@ -6,7 +6,7 @@
 
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Mulish',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
 h1,h2,h3,h4{font-family:'Montserrat',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.18}
 .mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
 
@@ -55,8 +55,8 @@ main{padding:40px 0 96px}
 .nav{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:24px;flex-wrap:wrap}
 .btn{font-family:'Montserrat';font-weight:700;font-size:14px;padding:12px 26px;border-radius:var(--r-md);border:1px solid transparent;cursor:pointer;transition:transform .12s,background .15s;display:inline-flex;align-items:center;gap:9px}
 .btn:active{transform:translateY(1px)}
-.btn-primary{background:var(--rb-red);color:#fff;box-shadow:0 6px 18px -8px rgba(188,0,23,.7)}
-.btn-primary:hover{background:#A30014}
+.btn-primary{background:var(--action);color:#fff;box-shadow:0 6px 18px -8px rgba(29,158,117,.7)}
+.btn-primary:hover{background:var(--action-deep)}
 .btn-ghost{background:var(--surface);color:var(--ink-2);border-color:var(--line)}
 .btn-ghost:hover{background:var(--line-soft)}
 .btn-sm{font-size:12.5px;padding:9px 16px}

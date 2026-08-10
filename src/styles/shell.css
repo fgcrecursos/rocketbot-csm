@@ -485,13 +485,13 @@ button {
   border-color: var(--ink-3);
 }
 .rbp-btn-primario {
-  background: var(--rb-red);
-  border-color: var(--rb-red);
+  background: var(--action);
+  border-color: var(--action);
   color: #fff;
 }
 .rbp-btn-primario:hover {
-  background: var(--rb-red-deep);
-  border-color: var(--rb-red-deep);
+  background: var(--action-deep);
+  border-color: var(--action-deep);
 }
 
 /* ---------- Cuerpo ---------- */

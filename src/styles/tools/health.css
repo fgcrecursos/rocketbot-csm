@@ -48,9 +48,8 @@ button{cursor:pointer; border:none; background:none}
 .btn{display:inline-flex; align-items:center; gap:8px; justify-content:center; padding:10px 16px; border-radius:10px; font-weight:600; font-size:14px; border:1px solid var(--line); background:var(--surface-2); color:var(--text); transition:background .18s var(--ease), border-color .18s var(--ease), transform .18s var(--ease)}
 .btn:hover{background:var(--surface-3); border-color:var(--faint)}
 .btn:active{transform:translateY(1px)}
-.btn-primary{background:var(--rb); border-color:var(--rb); color:#fff}
-.btn-primary:hover{background:var(--rb-hi); border-color:var(--rb-hi)}
-[data-theme="light"] .btn-primary:hover{background:#9E0013; border-color:#9E0013}
+.btn-primary{background:var(--action); border-color:var(--action); color:#fff}
+.btn-primary:hover{background:var(--action-deep); border-color:var(--action-deep)}
 .btn-ghost{background:transparent}
 .btn-sm{padding:7px 12px; font-size:13px; border-radius:8px}
 .btn-icon{padding:8px; width:36px; height:36px; border-radius:9px}

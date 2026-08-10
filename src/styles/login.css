@@ -86,8 +86,8 @@ body {
   width: 100%;
   padding: 11px 0;
   border-radius: var(--r-md);
-  border: 1px solid var(--rb-red);
-  background: var(--rb-red);
+  border: 1px solid var(--action);
+  background: var(--action);
   color: #fff;
   font-weight: 700;
   font-size: 14px;
@@ -96,8 +96,8 @@ body {
   transition: background 0.15s, border-color 0.15s;
 }
 .lg-btn:hover {
-  background: var(--rb-red-deep);
-  border-color: var(--rb-red-deep);
+  background: var(--action-deep);
+  border-color: var(--action-deep);
 }
 .lg-btn:disabled {
   opacity: 0.6;
