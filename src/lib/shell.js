@@ -193,9 +193,20 @@ export async function montarShell({ herramienta: idHerr, exigeCuenta = true }) {
   // resuelve — el llamador tiene un `await montarShell(...)` seguido de más
   // trabajo (cargar el motor, restaurar datos), y nada de eso debe correr
   // mientras el navegador procesa el redirect.
-  if (requiereLogin && !(await sesionActual())) {
-    location.replace('/login?volver=' + encodeURIComponent(location.pathname + location.search));
-    await new Promise(() => {});
+  if (requiereLogin) {
+    let sesion = null;
+    try {
+      sesion = await sesionActual();
+    } catch (e) {
+      // El backend no responde (proyecto dado de baja, sin red, DNS caído). Antes
+      // esto rompía el await de arranque y la página quedaba en blanco sin llegar
+      // a redirigir; ahora se cae al login, que sabe mostrar el error.
+      console.error('[armazón] no se pudo verificar la sesión', e);
+    }
+    if (!sesion) {
+      location.replace('/login?volver=' + encodeURIComponent(location.pathname + location.search));
+      await new Promise(() => {});
+    }
   }
   perfilCache = requiereLogin ? await perfilActual() : null;
 
