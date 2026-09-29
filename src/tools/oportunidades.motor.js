@@ -68,11 +68,11 @@ const AREAS = [
     desc:'Cuentas por pagar, tesorería, contabilidad y reportería financiera.',
     procesos:[
       {id:'fin_facturas', base:0.70, t:'Recepción y procesamiento de facturas de proveedores',
-        d:'Llegan por correo o portal y alguien las digita o carga al ERP.', prod:['AI Studio','RPA Studio','Orquestador']},
+        d:'Llegan por correo o portal y alguien las digita o carga al ERP.', prod:['Ai Studio','RPA Studio','Orquestador']},
       {id:'fin_concil', base:0.80, t:'Conciliación bancaria',
         d:'Descarga de cartolas y cruce manual contra los registros contables.', prod:['RPA Studio','Orquestador']},
       {id:'fin_pdf', base:0.65, t:'Extracción de datos desde PDF u otros documentos',
-        d:'Comprobantes, certificados, órdenes o estados de cuenta que se leen a mano.', prod:['AI Studio','Saturn Studio']},
+        d:'Comprobantes, certificados, órdenes o estados de cuenta que se leen a mano.', prod:['Ai Studio','Saturn Studio']},
       {id:'fin_reportes', base:0.80, t:'Generación de reportes y consolidados en Excel',
         d:'Alguien descarga, pega, cruza y formatea todos los meses lo mismo.', prod:['RPA Studio','Nexus']},
       {id:'fin_pagos', base:0.70, t:'Pagos y trámites en portales web',
@@ -94,9 +94,9 @@ const AREAS = [
       {id:'rh_usuarios', base:0.75, t:'Creación y baja de usuarios y accesos',
         d:'Onboarding y offboarding de cuentas en correo, ERP, VPN y otros sistemas.', prod:['RPA Studio','Saturn Studio','Xperience']},
       {id:'rh_contratos', base:0.70, t:'Generación de contratos, anexos y certificados',
-        d:'Documentos armados desde plantillas con datos que ya están en un sistema.', prod:['Saturn Studio','AI Studio']},
+        d:'Documentos armados desde plantillas con datos que ya están en un sistema.', prod:['Saturn Studio','Ai Studio']},
       {id:'rh_cv', base:0.55, t:'Filtrado inicial de currículums y postulaciones',
-        d:'Lectura y preclasificación manual de candidatos.', prod:['AI Studio','Saturn Studio']}
+        d:'Lectura y preclasificación manual de candidatos.', prod:['Ai Studio','Saturn Studio']}
     ]
   },
   {
@@ -106,13 +106,13 @@ const AREAS = [
       {id:'co_crm_erp', base:0.80, t:'Traspaso de datos entre CRM y ERP',
         d:'Clientes, pedidos, precios o estados que se copian de un sistema a otro.', prod:['RPA Studio','Saturn Studio']},
       {id:'co_cotiza', base:0.60, t:'Elaboración de cotizaciones y propuestas',
-        d:'Armado manual a partir de listas de precios y plantillas.', prod:['Saturn Studio','AI Studio','Xperience']},
+        d:'Armado manual a partir de listas de precios y plantillas.', prod:['Saturn Studio','Ai Studio','Xperience']},
       {id:'co_correos', base:0.70, t:'Envío de correos comerciales repetitivos',
         d:'Seguimientos, confirmaciones y recordatorios escritos uno a uno.', prod:['Saturn Studio','Orquestador']},
       {id:'co_oportunidades', base:0.70, t:'Registro y actualización manual de oportunidades',
         d:'El equipo carga en el CRM información que ya existe en otro lado.', prod:['RPA Studio','Xperience']},
       {id:'co_pedidos', base:0.70, t:'Ingreso de pedidos recibidos por correo o portal',
-        d:'Órdenes de compra de clientes que se transcriben al sistema.', prod:['AI Studio','RPA Studio']}
+        d:'Órdenes de compra de clientes que se transcriben al sistema.', prod:['Ai Studio','RPA Studio']}
     ]
   },
   {
@@ -120,11 +120,11 @@ const AREAS = [
     desc:'Canales de entrada, mesa de ayuda y resolución de solicitudes.',
     procesos:[
       {id:'at_email', base:0.60, t:'Solicitudes que llegan por correo y alguien debe leer y derivar',
-        d:'Triaje manual de una casilla compartida.', prod:['AI Studio','Saturn Studio']},
+        d:'Triaje manual de una casilla compartida.', prod:['Ai Studio','Saturn Studio']},
       {id:'at_repetitivas', base:0.60, t:'Respuesta a consultas repetitivas',
-        d:'Preguntas cuya respuesta ya está en un sistema o documento interno.', prod:['AI Studio','Saturn Studio']},
+        d:'Preguntas cuya respuesta ya está en un sistema o documento interno.', prod:['Ai Studio','Saturn Studio']},
       {id:'at_tickets', base:0.60, t:'Clasificación y asignación de tickets',
-        d:'Categorizar, priorizar y derivar cada caso a mano.', prod:['AI Studio','Orquestador']},
+        d:'Categorizar, priorizar y derivar cada caso a mano.', prod:['Ai Studio','Orquestador']},
       {id:'at_multisistema', base:0.70, t:'Consulta de varios sistemas para responder una sola solicitud',
         d:'El agente abre 3 o 4 pantallas para armar una respuesta.', prod:['RPA Studio','Saturn Studio','Nexus']},
       {id:'at_reclamos', base:0.65, t:'Registro y seguimiento de reclamos o postventa',
@@ -156,11 +156,11 @@ const AREAS = [
       {id:'cp_oc', base:0.70, t:'Generación de órdenes de compra',
         d:'Desde el requerimiento hasta la OC emitida en el ERP.', prod:['RPA Studio','Xperience']},
       {id:'cp_proveedores', base:0.70, t:'Alta y mantención de proveedores en el ERP',
-        d:'Captura de documentos, validación de datos y creación del registro.', prod:['RPA Studio','Xperience','AI Studio']},
+        d:'Captura de documentos, validación de datos y creación del registro.', prod:['RPA Studio','Xperience','Ai Studio']},
       {id:'cp_cotizaciones', base:0.55, t:'Solicitud y comparación de cotizaciones a proveedores',
-        d:'Envío de solicitudes y armado de cuadros comparativos.', prod:['Saturn Studio','AI Studio']},
+        d:'Envío de solicitudes y armado de cuadros comparativos.', prod:['Saturn Studio','Ai Studio']},
       {id:'cp_recepcion', base:0.70, t:'Cruce entre recepción, orden de compra y factura',
-        d:'Match a tres vías revisado documento por documento.', prod:['RPA Studio','AI Studio']},
+        d:'Match a tres vías revisado documento por documento.', prod:['RPA Studio','Ai Studio']},
       {id:'cp_seguimiento', base:0.65, t:'Seguimiento del estado de pedidos con proveedores',
         d:'Correos y llamadas para saber dónde está cada entrega.', prod:['Saturn Studio','Orquestador']}
     ]

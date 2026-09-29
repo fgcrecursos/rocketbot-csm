@@ -303,7 +303,7 @@ function hallazgos(m, s){
 const CATALOGO = {
   'RPA Studio':{color:'var(--rb-red)', ini:'RS', rol:'Ejecución sobre sistemas existentes',
     hace:['Opera los sistemas que ya usan, incluso los que no tienen API','Sustituye el trabajo de copiar, pegar, descargar y cargar entre plataformas','Ejecuta reglas definidas sin intervención humana']},
-  'AI Studio':{color:'var(--rb-blue)', ini:'AS', rol:'Comprensión de documentos y texto',
+  'Ai Studio':{color:'var(--rb-blue)', ini:'AS', rol:'Comprensión de documentos y texto',
     hace:['Extrae datos de facturas, contratos, comprobantes y correos','Clasifica y deriva según contenido, no según remitente','Entrega el dato ya estructurado al proceso que lo necesita']},
   'Saturn Studio':{color:'var(--rb-green)', ini:'SS', rol:'Orquestación de flujos e integraciones',
     hace:['Conecta los productos de la suite entre sí y con APIs externas','Incorpora modelos de lenguaje dentro de un flujo controlado','Reemplaza integraciones a medida por flujos mantenibles']},
@@ -341,11 +341,11 @@ function recomendarProductos(m, s, nivel){
 
   // Regla 2 — documentos no estructurados
   if(muchosDocumentos){
-    add('AI Studio', pocoAutomatizado ? 'Fase 2' : 'Fase 1', 'alta',
+    add('Ai Studio', pocoAutomatizado ? 'Fase 2' : 'Fase 1', 'alta',
       `Más de la mitad de los documentos llegan en PDF, imagen o correo, y con datos en ${m.datos} ese material es hoy trabajo humano puro. Es el caso donde la IA aplicada tiene el retorno más directo y más medible: extraer el dato para que la persona decida en vez de transcribir.`);
   } else if(m.datos < 60){
-    add('AI Studio','Fase 2','media',
-      `Aunque el volumen documental no es el problema principal, con datos en ${m.datos} hay tareas de interpretación y clasificación que siguen recayendo en personas. AI Studio aporta ahí, aplicado a casos acotados.`);
+    add('Ai Studio','Fase 2','media',
+      `Aunque el volumen documental no es el problema principal, con datos en ${m.datos} hay tareas de interpretación y clasificación que siguen recayendo en personas. Ai Studio aporta ahí, aplicado a casos acotados.`);
   }
 
   // Regla 3 — entrada de solicitudes
@@ -706,7 +706,7 @@ function renderMetodologia(R){
       <p style="margin-top:8px">Es deliberado: una empresa con tecnología en 91 y datos en 40 no está preparada para IA, por mucho que el promedio sugiera lo contrario. El modelo prefiere señalar el cuello de botella antes que suavizarlo con un promedio.</p>
 
       <h5>Recomendación de productos</h5>
-      <p>Se aplican reglas explícitas sobre los puntajes y sobre respuestas concretas. Por ejemplo: si más de la mitad de los documentos llega en PDF o correo, entra AI Studio; si las solicitudes llegan por correo, entra Xperience; si hay automatizaciones sin centro de excelencia ni medición, entra Orquestador. Un producto solo aparece si alguna regla lo activa.</p>
+      <p>Se aplican reglas explícitas sobre los puntajes y sobre respuestas concretas. Por ejemplo: si más de la mitad de los documentos llega en PDF o correo, entra Ai Studio; si las solicitudes llegan por correo, entra Xperience; si hay automatizaciones sin centro de excelencia ni medición, entra Orquestador. Un producto solo aparece si alguna regla lo activa.</p>
 
       <h5>Lo que este instrumento no hace</h5>
       <ul>

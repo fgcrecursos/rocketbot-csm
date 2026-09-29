@@ -60,7 +60,7 @@ const C_COMPLEJIDAD = [
    tip:'Si una persona debe decidir con criterio propio. No impide automatizar, pero desplaza el resultado hacia automatización asistida en vez de desatendida.'},
   {id:'documentos', n:'Uso de documentos no estructurados', p:1.0,
    a1:'Datos ya estructurados en sistemas', a5:'PDF, imágenes o correos que hay que leer',
-   tip:'Documentos que una persona debe interpretar para extraer el dato. Activa la recomendación de AI Studio.'},
+   tip:'Documentos que una persona debe interpretar para extraer el dato. Activa la recomendación de Ai Studio.'},
   {id:'ia', n:'Necesidad de IA', p:1.0,
    a1:'Reglas deterministas', a5:'Requiere clasificar, interpretar o redactar',
    tip:'Si el proceso necesita comprender lenguaje, clasificar por contenido o generar texto. Suma capacidad, pero también complejidad y necesidad de validación.'},
@@ -83,7 +83,7 @@ const CARACT = [
 
 const PRODUCTOS = {
   'RPA Studio':{c:'var(--rb-red)', r:'Ejecución sobre los sistemas existentes, con o sin API'},
-  'AI Studio':{c:'var(--rb-blue)', r:'Lectura y clasificación de documentos y texto'},
+  'Ai Studio':{c:'var(--rb-blue)', r:'Lectura y clasificación de documentos y texto'},
   'Saturn Studio':{c:'var(--rb-green)', r:'Orquestación de flujos, APIs y modelos de lenguaje'},
   'Orquestador':{c:'var(--rb-dark)', r:'Programación, control y trazabilidad de la ejecución'},
   'Xperience':{c:'var(--rb-amber)', r:'Entrada estructurada de solicitudes que disparan automatizaciones'},
@@ -183,11 +183,11 @@ function recomendar(pr, cx){
       : 'Ejecuta sobre los sistemas actuales sin exigir integración previa');
 
   if(k('pdf') || (cxv.documentos||0) >= 4)
-    add('AI Studio', 'Hay documentos que hoy alguien debe leer para extraer el dato');
+    add('Ai Studio', 'Hay documentos que hoy alguien debe leer para extraer el dato');
   if(k('correo'))
-    add('AI Studio', 'Las solicitudes llegan por correo y requieren interpretar el contenido antes de derivar');
+    add('Ai Studio', 'Las solicitudes llegan por correo y requieren interpretar el contenido antes de derivar');
   if((cxv.ia||0) >= 4)
-    add('AI Studio', 'El proceso exige clasificar o interpretar, no solo aplicar reglas');
+    add('Ai Studio', 'El proceso exige clasificar o interpretar, no solo aplicar reglas');
 
   if((cxv.ia||0) >= 3 && (cxv.sistemas||0) >= 3)
     add('Saturn Studio', 'Combina varios sistemas con decisiones no triviales: es un flujo, no una tarea');
@@ -872,7 +872,7 @@ function metodologia(A){
 
       <h5>Recomendación de productos</h5>
       <p>Reglas explícitas sobre las características marcadas y los criterios de complejidad. Por ejemplo: documentos
-      en 4 o más, o característica de PDF, activa AI Studio; cuatro o más sistemas activa Orquestador; una solicitud
+      en 4 o más, o característica de PDF, activa Ai Studio; cuatro o más sistemas activa Orquestador; una solicitud
       de usuario activa Xperience. Un producto solo aparece si alguna regla lo activó.</p>
 
       <h5>Lo que este cálculo no hace</h5>

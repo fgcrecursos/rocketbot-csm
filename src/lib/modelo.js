@@ -160,7 +160,7 @@ export const PLANES = [
    Antes cada herramienta traía su propia lista y sus propios colores. */
 export const PRODUCTOS = [
   { k: 'rpa', nombre: 'RPA Studio', capa: 'ejecucion', color: 'var(--rb-red)', logo: '/assets/logos/products/rpa-studio.png', rol: 'Ejecución sobre los sistemas existentes, con o sin API' },
-  { k: 'ai', nombre: 'AI Studio', capa: 'ejecucion', color: 'var(--rb-blue)', logo: '/assets/logos/products/ai-studio.png', rol: 'Lectura y clasificación de documentos y texto' },
+  { k: 'ai', nombre: 'Ai Studio', capa: 'ejecucion', color: 'var(--rb-blue)', logo: '/assets/logos/products/ai-studio.png', rol: 'Lectura y clasificación de documentos y texto' },
   { k: 'saturn', nombre: 'Saturn Studio', capa: 'ejecucion', color: 'var(--rb-green)', logo: '/assets/logos/products/saturn-studio.png', rol: 'Orquestación de flujos, APIs y modelos de lenguaje' },
   { k: 'orq', nombre: 'Orquestador', capa: 'control', color: 'var(--rb-secondary)', logo: '/assets/logos/products/orchestrator.png', rol: 'Programación, control y trazabilidad de la ejecución' },
   { k: 'xperience', nombre: 'Xperience', capa: 'entrada', color: 'var(--rb-amber)', logo: '/assets/logos/products/xperience.png', rol: 'Entrada estructurada de solicitudes que disparan automatizaciones' },

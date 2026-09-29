@@ -32,7 +32,7 @@ const PRODUCTS = [
   { k:'xperience', n:'Xperience',    layer:'entrada'   },
   { k:'rpa',       n:'RPA Studio',   layer:'ejecucion' },
   { k:'saturn',    n:'Saturn Studio',layer:'ejecucion' },
-  { k:'ai',        n:'AI Studio',    layer:'ejecucion' },
+  { k:'ai',        n:'Ai Studio',    layer:'ejecucion' },
   { k:'orq',       n:'Orquestador',  layer:'control'   },
   { k:'nexus',     n:'Nexus',        layer:'control'   }
 ];
